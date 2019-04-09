@@ -2,15 +2,8 @@ package se.iimetra.dataflowgram
 
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
-import org.python.util.PythonInterpreter
 import py4j.GatewayServer
-import java.nio.file.Files
-import java.nio.file.Paths
-import java.util.*
 
-fun funk(command: String) {
-
-}
 
 fun main(args: Array<String>) = runBlocking {
     println("Enter git repository")
@@ -26,30 +19,13 @@ fun main(args: Array<String>) = runBlocking {
         while (true) {
             val lib = libHolder.getLib()
             if (lib.toFile().exists()) {
-                val pythonProgram = """
-                  from py4j.java_gateway import JavaGateway
-                  exec(compile(open("lib/all.py", "rb").read(), "lib/all.py", 'exec'))
-                  gateway = JavaGateway()
-                """.trimIndent()
-                println("Enter command")
-                val command = readLine()
-                Files.write(Paths.get("tmp.py"), (pythonProgram + "\n" + command).toByteArray())
-
-                val processBuilder = ProcessBuilder("python", "tmp.py")
-                val process = processBuilder.start()
-
-                try {
-                    process.waitFor()
-                } catch (e: InterruptedException) {
-                    throw RuntimeException(e)
-                }
-
-
-                val inputStream = process.inputStream
-                val scanner = Scanner(inputStream)
-                while (scanner.hasNext()) {
-                    println(scanner.next())
-                }
+              val client = HelloWorldClient("localhost", 50051)
+              try {
+                var user = "world"
+                client.greet(user)
+              } finally {
+                client.shutdown()
+              }
             } else {
                 delay(1000)
             }
@@ -57,5 +33,4 @@ fun main(args: Array<String>) = runBlocking {
     } finally {
         gatewayServer.shutdown()
     }
-
 }
