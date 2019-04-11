@@ -1,8 +1,8 @@
 package se.iimetra.dataflowgram
 
 import kotlinx.coroutines.runBlocking
+import se.iimetra.dataflowgram.git.FunctionId
 import se.iimetra.dataflowgram.git.GitConnector
-import se.iimetra.dataflowgram.root.FunctionMeta
 import se.iimetra.dataflowgram.root.RootDispatcher
 
 fun main(args: Array<String>) = runBlocking {
@@ -18,7 +18,7 @@ fun main(args: Array<String>) = runBlocking {
     println("Enter version")
     val version = readLine()!!.toLong()
     val commandList = command.split("/")
-    val function = FunctionMeta(commandList[0], commandList[1], commandList[2], commandList[3].toInt())
+    val function = FunctionId(commandList[0], commandList[1], commandList[2], commandList[3])
     try {
       val job = dispatcher.execute(function, listOf(), version).join()
       println("Result $job")

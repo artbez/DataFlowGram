@@ -13,12 +13,13 @@ _ONE_DAY_IN_SECONDS = 60 * 60 * 24
 
 cwd = os.getcwd()
 sys.path.append(cwd + '/lib/')
+sys.path.append('/Users/artemii.bezguzikov/project/DataFlowGram/lib/')
 
 class ExecutionService(connector_pb2_grpc.ExecutorServicer):
     def Execute(self, request, context):
         arg_string = ",".join(request.args)
-        exec('myc.' + request.function + '(' + arg_string + ')')
-        return connector_pb2.ExecutionResult(message="123")
+        res = eval('myc.' + request.function + '(' + arg_string + ')')
+        return connector_pb2.ExecutionResult(message=res)
 
     def UpdateLib(self, request, context):
         globals()['myc'] = __import__('all')

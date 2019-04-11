@@ -3,8 +3,8 @@ package se.iimetra.dataflowgram.worker
 import io.grpc.ManagedChannel
 import io.grpc.ManagedChannelBuilder
 import io.grpc.StatusRuntimeException
+import se.iimetra.dataflowgram.git.FunctionId
 import se.iimetra.dataflowgram.lib.fullName
-import se.iimetra.dataflowgram.root.FunctionMeta
 import java.util.concurrent.TimeUnit
 import java.util.logging.Level
 import java.util.logging.Logger
@@ -24,7 +24,7 @@ class PythonServerClient internal constructor(private val channel: ManagedChanne
     channel.shutdown().awaitTermination(5, TimeUnit.SECONDS)
   }
 
-  fun executeCommand(functionMeta: FunctionMeta, args: List<String>) {
+  fun executeCommand(functionMeta: FunctionId, args: List<String>) {
     val requestBuilder = Connector.ExecutionRequest.newBuilder()
       .setFunction(fullName(functionMeta.category, functionMeta.file, functionMeta.name))
     args.forEachIndexed { index, s -> requestBuilder.setArgs(index, s) }

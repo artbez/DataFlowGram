@@ -39,13 +39,13 @@ class LibHolder {
   }
 
   private fun appendToLib(functions: List<FunctionDescription>) {
-    val imports = functions.flatMap { it.imports }.toSet()
+    val imports = functions.flatMap { it.view.imports }.toSet()
 
     Files.write(libFile, imports.filterNot { it.isBlank() }.joinToString("\n").toByteArray(),  StandardOpenOption.APPEND)
 
     val wholeBody = functions.map { func ->
-      val firstLine = "def ${func.fullName()}(${func.args}):"
-      listOf(firstLine) + func.content
+      val firstLine = "def ${func.fullName()}(${func.view.id.args}):"
+      listOf(firstLine) + func.view.content
     }.filterNot { it.isNullOrEmpty() }.joinToString("\n\n") { it.joinToString("\n") }
 
     Files.write(libFile, "\n$wholeBody\n".toByteArray(), StandardOpenOption.APPEND)
@@ -55,4 +55,4 @@ class LibHolder {
 
 fun fullName(category: String, file: String, name: String) = "${category}__${file}__$name"
 
-private fun FunctionDescription.fullName() = fullName(category, file, name)
+private fun FunctionDescription.fullName() = fullName(view.id.category, view.id.file, view.id.name)

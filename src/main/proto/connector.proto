@@ -11,15 +11,11 @@ message ExecutionRequest {
     repeated string args = 2;
 }
 
-// The response message containing the greetings
 message ExecutionResult {
-    //google.protobuf.Any message = 1;
-    string message = 1;
+    google.protobuf.Any message = 1;
 }
 
-// The greeter service definition.
 service Executor {
-    // Sends a greeting
     rpc Execute (ExecutionRequest) returns (ExecutionResult) {}
     rpc UpdateLib (Update) returns (Updated) {}
 }
