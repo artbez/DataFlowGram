@@ -1,6 +1,5 @@
 package se.iimetra.dataflowgram.worker
 
-import se.iimetra.dataflowgram.git.FunctionDescription
 import se.iimetra.dataflowgram.root.FunctionMeta
 import java.util.concurrent.CompletableFuture
 

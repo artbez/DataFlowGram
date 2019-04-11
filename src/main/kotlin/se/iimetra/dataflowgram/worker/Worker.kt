@@ -3,14 +3,11 @@ package se.iimetra.dataflowgram.worker
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
-import se.iimetra.dataflowgram.git.FunctionDescription
 import se.iimetra.dataflowgram.root.FunctionMeta
-import java.util.concurrent.ArrayBlockingQueue
 import java.util.concurrent.CompletableFuture
-import java.util.concurrent.CompletionStage
 
 class Worker {
-  private val actionQueue = Channel<WorkerAction>(20)
+  private val actionQueue = Channel<WorkerAction>()
 
   fun start() = GlobalScope.launch {
     while (true) {

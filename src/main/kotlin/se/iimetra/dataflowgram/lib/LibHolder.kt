@@ -11,8 +11,6 @@ class LibHolder {
   private val libLock = Mutex()
   private val libFile = Paths.get("lib/all.py")
 
-  fun getLib() = libFile
-
   suspend fun updateLib(functions: List<FunctionDescription>) {
     libLock.withLock {
       createIfNotExist()
