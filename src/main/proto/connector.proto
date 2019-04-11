@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option java_package = "se.iimetra.dataflowgram.connect";
+option java_package = "se.iimetra.dataflowgram.worker";
 
 
 // The request message containing the user's name.
