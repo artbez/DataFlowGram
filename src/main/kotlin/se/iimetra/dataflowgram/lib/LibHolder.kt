@@ -11,6 +11,16 @@ class LibHolder {
   private val libLock = Mutex()
   private val libFile = Paths.get("lib/all.py")
 
+  init {
+    val dir = Paths.get("lib")
+    if (!dir.toFile().exists()) {
+      Files.createDirectory(dir)
+    }
+    if (libFile.toFile().exists()) {
+      Files.delete(libFile)
+    }
+  }
+
   suspend fun updateLib(functions: List<FunctionDescription>) {
     libLock.withLock {
       createIfNotExist()
@@ -34,13 +44,15 @@ class LibHolder {
     Files.write(libFile, imports.filterNot { it.isBlank() }.joinToString("\n").toByteArray(),  StandardOpenOption.APPEND)
 
     val wholeBody = functions.map { func ->
-      val firstLine = "def ${func.fullName()}(${func.args()}):"
+      val firstLine = "def ${func.fullName()}(${func.args}):"
       listOf(firstLine) + func.content
     }.filterNot { it.isNullOrEmpty() }.joinToString("\n\n") { it.joinToString("\n") }
 
     Files.write(libFile, "\n$wholeBody\n".toByteArray(), StandardOpenOption.APPEND)
   }
 
-  private fun FunctionDescription.fullName() = "${category}__${file}__$name"
-  private fun FunctionDescription.args() = (0..argsNumber).joinToString(",") { "i$it" }
 }
+
+fun fullName(category: String, file: String, name: String) = "${category}__${file}__$name"
+
+private fun FunctionDescription.fullName() = fullName(category, file, name)

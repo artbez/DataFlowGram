@@ -1,19 +1,25 @@
 syntax = "proto3";
+import "google/protobuf/any.proto";
 
 option java_package = "se.iimetra.dataflowgram.worker";
 
+message Update {}
+message Updated {}
 
-// The request message containing the user's name.
-message HelloRequest {
-    string name = 1;
+message ExecutionRequest {
+    string function = 1;
+    repeated string args = 2;
 }
 
 // The response message containing the greetings
-message HelloReply {
+message ExecutionResult {
+    //google.protobuf.Any message = 1;
     string message = 1;
 }
+
 // The greeter service definition.
-service Greeter {
+service Executor {
     // Sends a greeting
-    rpc SayHello (HelloRequest) returns (HelloReply) {}
+    rpc Execute (ExecutionRequest) returns (ExecutionResult) {}
+    rpc UpdateLib (Update) returns (Updated) {}
 }

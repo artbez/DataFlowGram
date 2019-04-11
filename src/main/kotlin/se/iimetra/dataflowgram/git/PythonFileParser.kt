@@ -23,7 +23,7 @@ class PythonFileParser {
     return functionBodyIndexes.mapIndexed { index, pair ->
       CustomFunction(
         functionDescription[index].first,
-        functionDescription[index].second?.let { if (it.isBlank()) 0 else it.split(",").size } ?: 0,
+        functionDescription[index].second,
         lines.subList(pair.first + 1, pair.second),
         imports
       )

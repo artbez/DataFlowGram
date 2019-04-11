@@ -1,24 +1,33 @@
 from concurrent import futures
 import time
 import logging
+import os
 
 import grpc
+import sys
 
 import connector_pb2
 import connector_pb2_grpc
 
 _ONE_DAY_IN_SECONDS = 60 * 60 * 24
 
+cwd = os.getcwd()
+sys.path.append(cwd + '/lib/')
 
-class Greeter(connector_pb2_grpc.GreeterServicer):
+class ExecutionService(connector_pb2_grpc.ExecutorServicer):
+    def Execute(self, request, context):
+        arg_string = ",".join(request.args)
+        exec('myc.' + request.function + '(' + arg_string + ')')
+        return connector_pb2.ExecutionResult(message="123")
 
-    def SayHello(self, request, context):
-        return connector_pb2.HelloReply(message='Hello, %s!' % request.name)
+    def UpdateLib(self, request, context):
+        globals()['myc'] = __import__('all')
+        return connector_pb2.Updated()
 
 
 def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
-    connector_pb2_grpc.add_GreeterServicer_to_server(Greeter(), server)
+    connector_pb2_grpc.add_ExecutorServicer_to_server(ExecutionService(), server)
     server.add_insecure_port('[::]:50051')
     server.start()
     try:
