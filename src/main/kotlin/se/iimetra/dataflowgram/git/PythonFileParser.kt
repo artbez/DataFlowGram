@@ -1,8 +1,6 @@
-package se.iimetra.dataflowgram
+package se.iimetra.dataflowgram.git
 
 import java.util.regex.Pattern
-
-data class CustomFunction(val name: String, val args: String, val lines: List<String>, val imports: List<String>)
 
 class PythonFileParser {
   private val functionNamePattern = Pattern.compile("def (.*?)\\((.*?)\\):")
@@ -25,7 +23,7 @@ class PythonFileParser {
     return functionBodyIndexes.mapIndexed { index, pair ->
       CustomFunction(
         functionDescription[index].first,
-        functionDescription[index].second,
+        functionDescription[index].second?.let { if (it.isBlank()) 0 else it.split(",").size } ?: 0,
         lines.subList(pair.first + 1, pair.second),
         imports
       )

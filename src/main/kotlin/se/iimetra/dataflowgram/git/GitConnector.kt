@@ -1,4 +1,4 @@
-package se.iimetra.dataflowgram
+package se.iimetra.dataflowgram.git
 
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -7,20 +7,16 @@ import org.eclipse.jgit.api.Git
 import java.io.IOException
 import java.nio.file.*
 import java.nio.file.attribute.BasicFileAttributes
+import java.util.concurrent.atomic.AtomicLong
 import java.util.regex.Pattern
 import kotlin.streams.toList
-
-data class CategoryFileSpace(val name: String, val files: List<FileSpace>)
-data class FileSpace(val name: String, val lines: List<String>)
-
-interface GitListener {
-  suspend fun parseUpdate(categories: List<CategoryFileSpace>)
-}
 
 class GitConnector(remoteRepo: String) {
   private val localRepoDirectory = Paths.get("repo")
   private val listeners = mutableListOf<GitListener>()
   private val git: Git
+  private val parser = PythonFileParser()
+  private val version = AtomicLong(0)
 
   init {
     removeDirectory(localRepoDirectory)
@@ -35,28 +31,43 @@ class GitConnector(remoteRepo: String) {
       delay(3000)
       val updates = git.pull().call().fetchResult.trackingRefUpdates.isNotEmpty()
       if (updates) {
-        listeners.forEach { it.parseUpdate(lastVersion()) }
+        version.incrementAndGet()
+        listeners.forEach { it.parseUpdate(GitContent(version.get(), lastVersion())) }
       }
     }
   }
 
-  fun addListener(listener: GitListener) {
+  suspend fun addListener(listener: GitListener) {
     listeners.add(listener)
+    listener.parseUpdate(GitContent(version.get(), lastVersion()))
   }
 
-  private fun lastVersion(): List<CategoryFileSpace> {
-    return Files.list(localRepoDirectory)
+  private fun lastVersion(): List<FunctionDescription> {
+    val categories = Files.list(localRepoDirectory)
       .filter { Files.isDirectory(it) && !it.fileName.toString().startsWith(".") }
       .map { directory -> processCategory(directory) }
       .toList()
+
+    return categories.flatMap { category ->
+      category.files.flatMap { file ->
+        file.functions.map {
+          FunctionDescription(category.name, file.name, it.name, it.numArguments, it.lines, it.imports)
+        }
+      }
+    }
   }
 
-  private fun processCategory(path: Path): CategoryFileSpace {
+  private fun processCategory(path: Path): CategoryContent {
     val data = Files.list(path)
       .filter { Files.isRegularFile(it) }
-      .map { leaf -> FileSpace(leaf.shortFileName(), Files.readAllLines(leaf)) }
+      .map { leaf -> FileContent(leaf.shortFileName(), processFile(leaf)) }
       .toList()
-    return CategoryFileSpace(path.fileName.toString(), data)
+    return CategoryContent(path.fileName.toString(), data)
+  }
+
+  private fun processFile(path: Path): List<CustomFunction> {
+    val lines = Files.readAllLines(path)
+    return parser.parse(lines)
   }
 
   private fun removeDirectory(directory: Path) {
