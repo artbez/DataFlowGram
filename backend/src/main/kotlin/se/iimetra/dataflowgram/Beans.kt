@@ -1,12 +1,12 @@
 package se.iimetra.dataflowgram
 
 
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import org.springframework.context.ApplicationContextInitializer
+import org.springframework.context.event.ContextRefreshedEvent
+import org.springframework.context.event.EventListener
 import org.springframework.context.support.GenericApplicationContext
 import org.springframework.context.support.beans
+import org.springframework.stereotype.Component
 import se.iimetra.dataflowgram.controller.ConfigController
 import se.iimetra.dataflowgram.git.GitConnector
 import se.iimetra.dataflowgram.root.RootDispatcher
@@ -18,9 +18,20 @@ class BeansInitializer : ApplicationContextInitializer<GenericApplicationContext
       GitConnector(repo)
     }
     bean<RootDispatcher>()
-    runBlocking {
-      ref<GitConnector>().addListener(ref<RootDispatcher>())
-      ref<GitConnector>().addListener(ref<ConfigController>())
-    }
   }.initialize(applicationContext)
+}
+
+@Component
+class AfterInitializationHook(
+  val gitConnector: GitConnector,
+  val dispatcher: RootDispatcher,
+  val configController: ConfigController
+) {
+
+  @EventListener
+  fun handleContextRefresh(event: ContextRefreshedEvent) {
+    gitConnector.addListener(dispatcher)
+    gitConnector.addListener(configController)
+    gitConnector.start()
+  }
 }

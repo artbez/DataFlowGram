@@ -3,7 +3,7 @@ package se.iimetra.dataflowgram.controller
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import se.iimetra.dataflowgram.git.GitContent
+import se.iimetra.dataflow.GitContent
 import se.iimetra.dataflowgram.git.GitListener
 
 @RestController
@@ -18,7 +18,5 @@ class ConfigController: GitListener {
   }
 
   @GetMapping("all")
-  fun getConfig() {
-
-  }
+  fun getConfig() = currentConfig
 }

@@ -1,7 +1,6 @@
 package se.iimetra.dataflowgram
 
 import kotlinx.coroutines.runBlocking
-import se.iimetra.dataflowgram.git.FunctionId
 import se.iimetra.dataflowgram.git.GitConnector
 import se.iimetra.dataflowgram.root.RootDispatcher
 import java.nio.file.Paths

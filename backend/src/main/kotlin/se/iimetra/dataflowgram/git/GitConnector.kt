@@ -25,11 +25,11 @@ class GitConnector(remoteRepo: String) {
       .setURI(remoteRepo)
       .setDirectory(localRepoDirectory.toFile())
       .call()
-
-    start()
   }
 
-  private fun start() = GlobalScope.launch {
+  fun start() = GlobalScope.launch {
+    listeners.forEach { it.parseUpdate(GitContent(version.get(), lastVersion())) }
+
     while (true) {
       delay(3000)
       val updates = git.pull().call().fetchResult.trackingRefUpdates.isNotEmpty()
@@ -40,9 +40,8 @@ class GitConnector(remoteRepo: String) {
     }
   }
 
-  suspend fun addListener(listener: GitListener) {
+  fun addListener(listener: GitListener) {
     listeners.add(listener)
-    listener.parseUpdate(GitContent(version.get(), lastVersion()))
   }
 
   private fun lastVersion(): List<FunctionDescription> {
