@@ -9,12 +9,17 @@ $blue_color: rgb(0, 192, 255);
     padding: 2rem 2rem;
     margin-bottom: 4rem;
 
+    .dx-widget {
+      font-size: medium;
+    }
+
     &__title {
       text-align: center;
       margin-bottom: 2rem
     }
 
     &__line {
+      margin-top: 3rem;
       margin-bottom: 3rem;
       border-top: 1px solid #8c8b8b;
     }

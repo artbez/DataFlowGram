@@ -10,6 +10,8 @@ fun main(args: Array<String>) {
     kotlinext.js.require.invoke("styles/home-diagram-styles.scss")
     kotlinext.js.require.invoke("react-tippy/dist/tippy.css")
     kotlinext.js.require.invoke("react-tabs/style/react-tabs.scss")
+    kotlinext.js.require.invoke("devextreme/dist/css/dx.common.css")
+    kotlinext.js.require.invoke("devextreme/dist/css/dx.light.compact.css")
 
     render(document.getElementById("root")) {
         reactRouter.BrowserRouter {
