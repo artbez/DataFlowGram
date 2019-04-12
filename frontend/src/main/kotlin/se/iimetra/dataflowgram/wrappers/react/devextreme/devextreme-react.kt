@@ -8,6 +8,7 @@ external interface TreeViewProps: RProps {
   var id: String
   var items: dynamic
   var searchEnabled: Boolean
+  var onItemClick: (dynamic) -> Unit
 }
 
 @JsName("TreeView")

@@ -56,7 +56,7 @@ dependencies {
 
 
     testCompile "org.jetbrains.kotlin:kotlin-test-js:$kotlin_version"
-//    expectedBy project(":common")
+    expectedBy project(":common")
 }
 
 compileKotlin2Js {

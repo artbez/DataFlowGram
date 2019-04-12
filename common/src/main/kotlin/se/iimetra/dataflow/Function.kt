@@ -20,6 +20,8 @@ data class FunctionDescription(
   val view: FunctionTextView
 )
 
+fun FunctionDescription.fullId() = "${view.id.category}__${view.id.file}__${view.id.name}"
+
 @Serializable
 data class GitContent(val version: Long, val functions: List<FunctionDescription>)
 
