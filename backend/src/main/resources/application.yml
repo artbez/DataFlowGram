@@ -1,0 +1,4 @@
+context:
+  initializer:
+    classes: se.iimetra.dataflowgram.BeansInitializer
+

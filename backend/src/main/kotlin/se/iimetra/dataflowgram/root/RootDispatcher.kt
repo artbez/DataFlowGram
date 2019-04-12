@@ -14,7 +14,7 @@ class RootDispatcher : GitListener {
   private val cache = FunctionsCache()
   private val worker = Worker()
 
-  fun start() {
+  init {
     worker.start()
   }
 

@@ -24,9 +24,11 @@ class GitConnector(remoteRepo: String) {
       .setURI(remoteRepo)
       .setDirectory(localRepoDirectory.toFile())
       .call()
+
+    start()
   }
 
-  fun start() = GlobalScope.launch {
+  private fun start() = GlobalScope.launch {
     while (true) {
       delay(3000)
       val updates = git.pull().call().fetchResult.trackingRefUpdates.isNotEmpty()
