@@ -2,7 +2,7 @@ package se.iimetra.dataflowgram.lib
 
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import se.iimetra.dataflowgram.git.FunctionDescription
+import se.iimetra.dataflow.FunctionDescription
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.nio.file.StandardOpenOption

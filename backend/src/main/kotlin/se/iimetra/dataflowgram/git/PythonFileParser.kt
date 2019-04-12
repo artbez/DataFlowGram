@@ -1,5 +1,7 @@
 package se.iimetra.dataflowgram.git
 
+import se.iimetra.dataflow.CustomFunction
+import se.iimetra.dataflow.FunctionSignature
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 

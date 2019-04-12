@@ -1,8 +1,9 @@
 package se.iimetra.dataflowgram.root
 
-import se.iimetra.dataflowgram.git.FunctionDescription
-import se.iimetra.dataflowgram.git.FunctionId
-import se.iimetra.dataflowgram.git.GitContent
+import se.iimetra.dataflow.FunctionDescription
+import se.iimetra.dataflow.FunctionId
+import se.iimetra.dataflow.GitContent
+
 
 data class CacheValue(val version: Long, val description: FunctionDescription)
 

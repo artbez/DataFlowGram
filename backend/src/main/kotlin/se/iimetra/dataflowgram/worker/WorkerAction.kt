@@ -1,6 +1,6 @@
 package se.iimetra.dataflowgram.worker
 
-import se.iimetra.dataflowgram.git.FunctionId
+import se.iimetra.dataflow.FunctionId
 import java.nio.file.Path
 import java.util.concurrent.CompletableFuture
 

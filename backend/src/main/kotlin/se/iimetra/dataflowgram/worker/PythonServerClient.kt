@@ -3,7 +3,7 @@ package se.iimetra.dataflowgram.worker
 import io.grpc.ManagedChannel
 import io.grpc.ManagedChannelBuilder
 import io.grpc.StatusRuntimeException
-import se.iimetra.dataflowgram.git.FunctionId
+import se.iimetra.dataflow.FunctionId
 import se.iimetra.dataflowgram.lib.fullName
 import java.util.concurrent.TimeUnit
 import java.util.logging.Level

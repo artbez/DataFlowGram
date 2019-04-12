@@ -1,7 +1,7 @@
 package se.iimetra.dataflowgram.root
 
-import se.iimetra.dataflowgram.git.FunctionId
-import se.iimetra.dataflowgram.git.GitContent
+import se.iimetra.dataflow.FunctionId
+import se.iimetra.dataflow.GitContent
 import se.iimetra.dataflowgram.git.GitListener
 import se.iimetra.dataflowgram.lib.LibHolder
 import se.iimetra.dataflowgram.worker.Worker

@@ -5,7 +5,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
-import se.iimetra.dataflowgram.git.FunctionId
+import se.iimetra.dataflow.FunctionId
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
