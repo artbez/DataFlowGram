@@ -8,12 +8,9 @@ data class FunctionSignature(val input: List<String>, val output: String)
 
 data class FunctionMeta(val signature: FunctionSignature, val params: String?, val description: String?)
 
-data class FunctionId(
-  val category: String, val file: String,
-  val name: String, val args: String
-)
+data class FunctionId(val category: String, val file: String, val name: String)
 
-data class FunctionTextView(val id: FunctionId, val content: List<String>, val imports: List<String>)
+data class FunctionTextView(val id: FunctionId, val args: String, val content: List<String>, val imports: List<String>)
 
 data class FunctionDescription(
   val meta: FunctionMeta,

@@ -53,7 +53,7 @@ class GitConnector(remoteRepo: String) {
         file.functions.map {
           FunctionDescription(
             FunctionMeta(it.signature, it.params, it.description),
-            FunctionTextView(FunctionId(category.name, file.name, it.name, it.args), it.lines, it.imports)
+            FunctionTextView(FunctionId(category.name, file.name, it.name), it.args, it.lines, it.imports)
           )
         }
       }

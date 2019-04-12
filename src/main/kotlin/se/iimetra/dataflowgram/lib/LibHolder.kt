@@ -44,7 +44,7 @@ class LibHolder {
     Files.write(libFile, imports.filterNot { it.isBlank() }.joinToString("\n").toByteArray(),  StandardOpenOption.APPEND)
 
     val wholeBody = functions.map { func ->
-      val firstLine = "def ${func.fullName()}(${func.view.id.args}):"
+      val firstLine = "def ${func.fullName()}(${func.view.args}):"
       listOf(firstLine) + func.view.content
     }.filterNot { it.isNullOrEmpty() }.joinToString("\n\n") { it.joinToString("\n") }
 

@@ -9,13 +9,23 @@ message Updated {}
 message ExecutionRequest {
     string function = 1;
     repeated string args = 2;
+    map<string, string> params = 3;
 }
 
 message ExecutionResult {
-    google.protobuf.Any message = 1;
+    string ref = 1;
+}
+
+message OutRequest {
+    string ref = 1;
+}
+
+message OutResult {
+    string json = 1;
 }
 
 service Executor {
     rpc Execute (ExecutionRequest) returns (ExecutionResult) {}
+    rpc Out (OutRequest) returns (OutResult) {}
     rpc UpdateLib (Update) returns (Updated) {}
 }

@@ -24,10 +24,28 @@ class PythonServerClient internal constructor(private val channel: ManagedChanne
     channel.shutdown().awaitTermination(5, TimeUnit.SECONDS)
   }
 
-  fun executeCommand(functionMeta: FunctionId, args: List<String>) {
+  fun getJson(ref: String): String {
+    val request = Connector.OutRequest.newBuilder().setRef(ref).build()
+    val response = blockingStub.out(request)
+    return response.json
+  }
+
+  fun executeDefaultCommand(function: String, params: Map<String, String>): String {
+    val requestBuilder = Connector.ExecutionRequest.newBuilder()
+      .setFunction(function)
+      .putAllParams(params)
+
+    val request = requestBuilder.build()
+    val response = blockingStub.execute(request)
+    return response.ref
+  }
+
+  fun executeCommand(functionMeta: FunctionId, args: List<String>, params: Map<String, String>): String {
     val requestBuilder = Connector.ExecutionRequest.newBuilder()
       .setFunction(fullName(functionMeta.category, functionMeta.file, functionMeta.name))
-    args.forEachIndexed { index, s -> requestBuilder.setArgs(index, s) }
+      .addAllArgs(args)
+      .putAllParams(params)
+
     val request = requestBuilder.build()
 
     val response = try {
@@ -37,7 +55,7 @@ class PythonServerClient internal constructor(private val channel: ManagedChanne
       throw Exception()
     }
 
-    logger.info(response.message.toString())
+    return response.ref
   }
 
   fun update(): Boolean {

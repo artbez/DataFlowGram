@@ -15,15 +15,50 @@ cwd = os.getcwd()
 sys.path.append(cwd + '/lib/')
 sys.path.append('/Users/artemii.bezguzikov/project/DataFlowGram/lib/')
 
+global_vars = {}
+next_id = 0
+
+
+def init_file(params):
+    return params['path']
+
+
 class ExecutionService(connector_pb2_grpc.ExecutorServicer):
     def Execute(self, request, context):
-        arg_string = ",".join(request.args)
-        res = eval('myc.' + request.function + '(' + arg_string + ')')
-        return connector_pb2.ExecutionResult(message=res)
+        global global_vars
+        parsed = list(map(lambda x: 'global_vars[\'' + x + '\']', request.args))
+
+        arg_string = ",".join(parsed)
+        params = request.params
+        if params is None or params == {}:
+            res = eval('myc.' + request.function + '(' + arg_string + ')')
+        else:
+            if params['is_default_function'] == "true":
+                prefix = ''
+            else:
+                prefix = 'myc.'
+
+            if arg_string is None or arg_string == '':
+                arg_suffix = ''
+            else:
+                arg_suffix = ','
+            res = eval(prefix + request.function + '(' + arg_string + arg_suffix + 'params)')
+
+        global next_id
+        next_name = 'i' + str(next_id)
+        next_id = next_id + 1
+
+        global_vars[next_name] = res
+        return connector_pb2.ExecutionResult(ref=next_name)
 
     def UpdateLib(self, request, context):
         globals()['myc'] = __import__('all')
         return connector_pb2.Updated()
+
+    def Out(self, request, context):
+        global global_vars
+        res = global_vars[request.ref]
+        return connector_pb2.OutResult(json=str(res))
 
 
 def serve():

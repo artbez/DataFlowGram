@@ -4,15 +4,15 @@ import java.util.regex.Matcher
 import java.util.regex.Pattern
 
 class PythonFileParser {
-  private val signaturePattern = Pattern.compile("#signature=((.*?))->(.*?)")
-  private val paramsPattern = Pattern.compile("#params=(.*?)")
-  private val descriptionPattern = Pattern.compile("#description=")
+  private val signaturePattern = Pattern.compile("# signature=\\((.*?)\\)->(.+?)$")
+  private val paramsPattern = Pattern.compile("# params=(.*?)")
+  private val descriptionPattern = Pattern.compile("# description=")
   private val functionNamePattern = Pattern.compile("def (.*?)\\((.*?)\\):")
 
   fun parse(lines: List<String>): List<CustomFunction> {
     val imports = lines.filter { it.startsWith("import ") || it.startsWith("from ") }
     val functionStartIndexes = lines
-      .mapIndexed { index, s ->  index to s.replace("\\s","").startsWith("#signature") }
+      .mapIndexed { index, s ->  index to s.replace(" ","").startsWith("#signature") }
       .filter { it.second }
       .map { it.first }
 
@@ -33,7 +33,7 @@ class PythonFileParser {
       group(1) to group(2)
     }!!
 
-    return CustomFunction(signature!!, params, description, name, arguments, lines.subList(firstNotNullIndex, lines.size), imports)
+    return CustomFunction(signature!!, params, description, name, arguments, lines.subList(firstNotNullIndex + 1, lines.size), imports)
   }
 
   private fun <T : Any> find(pattern: Pattern, lines: List<String>, match: Matcher.() -> T) = lines.mapNotNull {

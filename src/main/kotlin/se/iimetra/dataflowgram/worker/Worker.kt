@@ -42,12 +42,21 @@ class Worker {
           client.update()
         }
         is WorkerAction.Execute -> {
-          println("Execute $action")
-          client.executeCommand(action.function, action.arguments)
-          action.resultRef.complete("answer: 123")
+          val ref = client.executeCommand(action.function, action.arguments, action.params)
+          action.result.complete(ref)
         }
         is WorkerAction.CreateFile -> {
-          writeFile(action.path, action.name)
+          val newPath = writeFile(action.path, action.name)
+          val fileRef = client.initFile(newPath)
+          action.result.complete(fileRef)
+        }
+        is WorkerAction.GetJson -> {
+          val json = client.getJson(action.ref)
+          action.result.complete(json)
+        }
+        is WorkerAction.InitFile -> {
+          val fileRef = client.initFile(Paths.get("lib/${action.name}"))
+          action.result.complete(fileRef)
         }
       }
     }
@@ -57,17 +66,39 @@ class Worker {
     actionQueue.send(WorkerAction.Update)
   }
 
-  suspend fun execute(function: FunctionId, args: List<String>): CompletableFuture<String?> {
-    val future = CompletableFuture<String?>()
-    actionQueue.send(WorkerAction.Execute(function, args, future))
+  suspend fun execute(function: FunctionId, args: List<String>, params: Map<String, String>): CompletableFuture<String> {
+    val future = CompletableFuture<String>()
+    actionQueue.send(WorkerAction.Execute(function, args, params, future))
     return future
   }
 
-  private fun writeFile(path: Path, name: String) {
+  suspend fun uploadFile(path: Path): CompletableFuture<String> {
+    val future = CompletableFuture<String>()
+    actionQueue.send(WorkerAction.CreateFile(path, path.toFile().name, future))
+    return future
+  }
+
+  suspend fun initFile(name: String): CompletableFuture<String> {
+    val future = CompletableFuture<String>()
+    actionQueue.send(WorkerAction.InitFile(name, future))
+    return future
+  }
+
+  suspend fun getJson(ref: String): CompletableFuture<String> {
+    val future = CompletableFuture<String>()
+    actionQueue.send(WorkerAction.GetJson(ref, future))
+    return future
+  }
+
+  private fun writeFile(path: Path, name: String): Path {
     val file = Paths.get("lib/$name")
     if (file.toFile().exists()) {
       file.toFile().delete()
     }
     Files.copy(path, file)
+    return file.toAbsolutePath()
   }
+
+  private fun PythonServerClient.initFile(path: Path): String =
+    executeDefaultCommand("init_file", mapOf("path" to path.toAbsolutePath().toString(), "is_default_function" to "true"))
 }
