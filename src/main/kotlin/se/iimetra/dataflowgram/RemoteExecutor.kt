@@ -45,6 +45,3 @@ suspend fun RootDispatcher.processCommand(command: String): CompletableFuture<St
   val function = FunctionId(commandList[0], commandList[1], commandList[2])
   return execute(function, commandList[3].split(" ").toList(), version)
 }
-
-//data$DataFrame$read_csv$'/Users/artemii.bezguzikov/project/tmp/test.csv'
-
