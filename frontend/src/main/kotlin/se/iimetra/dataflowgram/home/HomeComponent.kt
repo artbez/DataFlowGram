@@ -4,6 +4,8 @@ import kotlinext.js.invoke
 import react.*
 import react.dom.div
 import se.iimetra.dataflowgram.header.header
+import se.iimetra.dataflowgram.home.diagram.palette.palette
+import se.iimetra.dataflowgram.home.diagram.scene
 import se.iimetra.dataflowgram.wrappers.react.diagrams.DiagramEngine
 
 class HomeComponent : RComponent<RProps, RState>() {
@@ -17,7 +19,7 @@ class HomeComponent : RComponent<RProps, RState>() {
   }
 
   override fun componentWillMount() {
-    engine = DiagramEngine()
+    engine = DiagramEngine().setup()
   }
 
   override fun RBuilder.render() {
@@ -26,8 +28,17 @@ class HomeComponent : RComponent<RProps, RState>() {
       div("col-md-2") {
       }
       div("main-scene col-md-7") {
+        scene {
+          attrs {
+            engine = this@HomeComponent.engine
+            updateDiagram = { forceUpdate {} }
+          }
+        }
       }
       div("col-md-3") {
+        palette {
+          attrs { }
+        }
       }
     }
   }

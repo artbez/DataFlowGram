@@ -1,0 +1,59 @@
+$green_color: rgb(192, 255, 0);
+$blue_color: rgb(0, 192, 255);
+
+.palette {
+
+  &__block {
+    background-color: white;
+    border-radius: 10px;
+    padding: 2rem 2rem;
+    margin-bottom: 4rem;
+
+    &__title {
+      text-align: center;
+      margin-bottom: 2rem
+    }
+
+    &__line {
+      margin-bottom: 3rem;
+      border-top: 1px solid #8c8b8b;
+    }
+  }
+}
+
+.node_item {
+  display: flex;
+  flex-direction: row;
+  justify-content: left;
+  margin-bottom: 1rem;
+
+  &__widget {
+    width: 4.5rem;
+    height: 4.5rem;
+  }
+
+  &__title {
+    margin-left: 3rem;
+    transform: translateY(25%);
+  }
+}
+
+
+.tray {
+  display: flex;
+  flex-direction: row;
+}
+
+.tray-item {
+  width: 4.5rem;
+  height: 4.5rem;
+  margin-left: 2rem;
+
+  &__in {
+    background-color: $green_color;
+  }
+
+  &__out {
+    background-color: $blue_color;
+  }
+}

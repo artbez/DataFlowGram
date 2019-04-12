@@ -1,4 +1,6 @@
+
 context:
   initializer:
     classes: se.iimetra.dataflowgram.BeansInitializer
-
+server:
+  port: 9090
