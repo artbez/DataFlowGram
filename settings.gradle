@@ -1,2 +1,5 @@
 rootProject.name = 'dataflowgram'
 
+include 'common'
+include 'frontend'
+include 'backend'
