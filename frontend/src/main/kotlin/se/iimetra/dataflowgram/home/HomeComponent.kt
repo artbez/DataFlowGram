@@ -9,6 +9,7 @@ import react.*
 import react.dom.div
 import se.iimetra.dataflow.GitContent
 import se.iimetra.dataflowgram.header.header
+import se.iimetra.dataflowgram.home.diagram.editor.editor
 import se.iimetra.dataflowgram.home.diagram.palette.palette
 import se.iimetra.dataflowgram.home.diagram.scene
 import se.iimetra.dataflowgram.utils.get
@@ -41,6 +42,9 @@ class HomeComponent : RComponent<RProps, RState>() {
     header
     div("row home-all") {
       div("col-md-2") {
+        editor {
+
+        }
       }
       div("main-scene col-md-7") {
         scene {

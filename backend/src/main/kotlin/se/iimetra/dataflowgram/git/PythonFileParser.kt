@@ -35,7 +35,7 @@ class PythonFileParser {
       group(1) to group(2)
     }!!
 
-    return CustomFunction(signature!!, params, description, name, arguments, lines.subList(firstNotNullIndex + 1, lines.size), imports)
+    return CustomFunction(signature!!, params, description, name, arguments, lines, imports)
   }
 
   private fun <T : Any> find(pattern: Pattern, lines: List<String>, match: Matcher.() -> T) = lines.mapNotNull {

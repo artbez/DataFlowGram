@@ -7,6 +7,7 @@ import react.dom.div
 import se.iimetra.dataflow.FunctionDescription
 import se.iimetra.dataflow.FunctionId
 import se.iimetra.dataflow.fullId
+import se.iimetra.dataflow.toMathText
 import se.iimetra.dataflowgram.home.configController
 import se.iimetra.dataflowgram.home.diagram.palette.blocks.categoryBlock
 import se.iimetra.dataflowgram.wrappers.react.tabs.Tab
@@ -80,7 +81,7 @@ class Palette : RComponent<RProps, Palette.State>() {
             items = en.value.map {
               ViewCell(
                 it.fullId(),
-                "${it.view.id.name} : (${it.meta.signature.input.joinToString(",")}) -> ${it.meta.signature.output}",
+                "${it.view.id.name} : ${it.meta.signature.toMathText()}",
                 expanded = false
               )
             }

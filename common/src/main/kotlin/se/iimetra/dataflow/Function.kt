@@ -5,6 +5,8 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class FunctionSignature(val input: List<String>, val output: String)
 
+fun FunctionSignature.toMathText() = "(${input.joinToString(",")}) -> $output"
+
 @Serializable
 data class FunctionMeta(val signature: FunctionSignature, val params: String?, val description: String?)
 
