@@ -10,7 +10,9 @@
     "storm-react-diagrams": "^5.0.0",
     "react-tabs": "^3.0.0",
     "devextreme": "^18.2.7",
-    "devextreme-react": "^18.2.7"
+    "devextreme-react": "^18.2.7",
+    "svgjs": "^2.6.2",
+    "svg-text": "^0.5.1"
   },
   "devDependencies": {
     "css-loader": "^0.28.7",

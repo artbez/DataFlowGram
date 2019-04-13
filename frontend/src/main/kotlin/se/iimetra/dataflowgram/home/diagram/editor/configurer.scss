@@ -65,3 +65,14 @@
   overflow-y: scroll;
   max-height: 20rem;
 }
+
+.my-rect {
+ stroke-width: 4px;
+ stroke: blue;
+}
+
+#tmp_id {
+  * {
+    font-size: 18px;
+  }
+}

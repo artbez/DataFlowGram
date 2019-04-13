@@ -1,5 +1,7 @@
 package se.iimetra.dataflowgram.home.diagram.editor
 
+import kotlinext.js.js
+import kotlinx.html.id
 import react.*
 import react.dom.*
 import se.iimetra.dataflow.FunctionDescription
@@ -7,12 +9,41 @@ import se.iimetra.dataflow.toMathText
 import se.iimetra.dataflowgram.dom.logIcon
 import se.iimetra.dataflowgram.wrappers.react.bootstrap.OverlayTrigger
 import se.iimetra.dataflowgram.wrappers.react.bootstrap.Popover
-import kotlin.browser.window
+import se.iimetra.dataflowgram.wrappers.svgtext.SvgText
+import kotlin.browser.document
+import kotlin.js.json
+import kotlin.reflect.KClass
 
 class FunctionDescriptionView : RComponent<FunctionDescriptionView.Props, RState>() {
 
   interface Props : RProps {
     var function: FunctionDescription
+  }
+
+  override fun componentDidMount() {
+    val t = SvgText.default
+    val el = document.getElementById("tmp_id")!!
+    val ops = json(
+      "text" to "| ${props.function.view.id.name} |",
+      "rect" to json("fill" to "#FFF", "class" to "my-rect"),
+      "element" to el
+    )
+    val s = js("new t(ops)")
+    el.asDynamic().style.width = s.bounds.width
+    el.asDynamic().style.height = s.bounds.height
+  }
+
+  override fun componentDidUpdate(prevProps: Props, prevState: RState) {
+    val t = SvgText.default
+    val el = document.getElementById("tmp_id")!!
+    val ops = json(
+      "text" to "| ${props.function.view.id.name} |",
+      "rect" to json("fill" to "#FFF", "class" to "my-rect"),
+      "element" to el
+    )
+    val s = js("new t(ops)")
+    el.asDynamic().style.width = s.bounds.width
+    el.asDynamic().style.height = s.bounds.height
   }
 
   override fun RBuilder.render() {
@@ -61,6 +92,10 @@ class FunctionDescriptionView : RComponent<FunctionDescriptionView.Props, RState
             logIcon("log-section__icon") { }
           }
         }
+      }
+      div("configurer-props__group") {
+        b { +"Drag to Scene:" }
+        svg { attrs.id = "tmp_id" }
       }
     }
   }
