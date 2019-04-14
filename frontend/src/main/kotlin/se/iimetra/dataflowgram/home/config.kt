@@ -1,6 +1,8 @@
 package se.iimetra.dataflowgram.home
 
+import kotlinx.serialization.ImplicitReflectionSerializer
 import se.iimetra.dataflowgram.home.controllers.ConfigController
+import se.iimetra.dataflowgram.home.controllers.EventController
 import se.iimetra.dataflowgram.home.controllers.PaletteChoseController
 import se.iimetra.dataflowgram.home.diagram.node.DefaultNodeFactory
 import se.iimetra.dataflowgram.wrappers.react.diagrams.DiagramEngine
@@ -20,3 +22,5 @@ fun DiagramEngine.setup(): DiagramEngine {
 
 val configController = ConfigController()
 val paletteChoseController = PaletteChoseController()
+@ImplicitReflectionSerializer
+val eventController = EventController()

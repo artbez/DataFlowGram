@@ -8,6 +8,7 @@ import org.springframework.context.support.GenericApplicationContext
 import org.springframework.context.support.beans
 import org.springframework.stereotype.Component
 import se.iimetra.dataflowgram.controller.ConfigController
+import se.iimetra.dataflowgram.controller.ws.TrainWSHandler
 import se.iimetra.dataflowgram.git.GitConnector
 import se.iimetra.dataflowgram.root.RootDispatcher
 
@@ -18,6 +19,7 @@ class BeansInitializer : ApplicationContextInitializer<GenericApplicationContext
       GitConnector(repo)
     }
     bean<RootDispatcher>()
+    bean<TrainWSHandler>()
   }.initialize(applicationContext)
 }
 
@@ -25,13 +27,13 @@ class BeansInitializer : ApplicationContextInitializer<GenericApplicationContext
 class AfterInitializationHook(
   val gitConnector: GitConnector,
   val dispatcher: RootDispatcher,
-  val configController: ConfigController
+  val wsHandler: TrainWSHandler
 ) {
 
   @EventListener
   fun handleContextRefresh(event: ContextRefreshedEvent) {
     gitConnector.addListener(dispatcher)
-    gitConnector.addListener(configController)
+    gitConnector.addListener(wsHandler)
     gitConnector.start()
   }
 }

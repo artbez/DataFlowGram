@@ -15,12 +15,9 @@ class ConfigController {
   var gitContent = GitContent(-1, emptyList())
   private val listeners = mutableListOf<(GitContent) -> Unit>()
 
-  init {
-    GlobalScope.launch {
-      val config = get("/api/config/all")
-      gitContent = Json.parse(GitContent.serializer(), config)
-      listeners.forEach { it.invoke(gitContent) }
-    }
+  fun push(git: GitContent) {
+    gitContent = git
+    listeners.forEach { it.invoke(git) }
   }
 
   fun addListener(listener: (GitContent) -> Unit) {
