@@ -1,3 +1,6 @@
+$green_color: rgb(192, 255, 0);
+$blue_color: rgb(0, 192, 255);
+
 .configurer-props {
   display: flex;
   justify-content: flex-start;
@@ -71,8 +74,39 @@
  stroke: blue;
 }
 
-#tmp_id {
-  * {
-    font-size: 18px;
+.node_item {
+  display: inline-block;
+  //display: flex;
+  //flex-direction: row;
+  //justify-content: left;
+  //margin-bottom: 1rem;
+
+  &__widget {
+    display: inline-block;
+  }
+
+  //&__title {
+  //  margin-left: 3rem;
+  //  transform: translateY(25%);
+  //}
+}
+
+
+.tray {
+  display: flex;
+  flex-direction: row;
+}
+
+.tray-item {
+  //width: 4.5rem;
+  //height: 4.5rem;
+  //margin-left: 2rem;
+
+  &__in {
+    background-color: $green_color;
+  }
+
+  &__out {
+    background-color: $blue_color;
   }
 }

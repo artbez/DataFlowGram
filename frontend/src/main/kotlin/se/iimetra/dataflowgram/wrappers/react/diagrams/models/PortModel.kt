@@ -2,6 +2,7 @@
 
 package se.iimetra.dataflowgram.wrappers.react.diagrams.models
 
+import se.iimetra.dataflowgram.home.diagram.node.ports.InitialPortModel
 import se.iimetra.dataflowgram.utils.JsMap
 import se.iimetra.dataflowgram.wrappers.react.diagrams.BaseModelListener
 import se.iimetra.dataflowgram.wrappers.react.diagrams.LinkModelListener
@@ -23,7 +24,7 @@ open external class PortModel(
     fun getLinks(): JsMap<LinkModel<LinkModelListener>>
     open fun createLinkModel(): LinkModel<out LinkModelListener>?
     fun updateCoords(coords: Coordinates): Coordinates
-    //open fun canLinkToPort(port: InitialPortModel): Boolean
+    open fun canLinkToPort(port: InitialPortModel): Boolean
 
     interface Coordinates {
         var x: Double

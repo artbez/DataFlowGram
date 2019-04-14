@@ -1,13 +1,20 @@
 package se.iimetra.dataflowgram.home.diagram
 
+import jquery.JQuery
 import kotlinext.js.invoke
 import kotlinx.html.js.onContextMenuFunction
 import kotlinx.html.js.onDragOverFunction
 import kotlinx.html.js.onDropFunction
+import org.w3c.dom.events.Event
+import org.w3c.dom.get
 import react.*
 import react.dom.div
+import se.iimetra.dataflowgram.wrappers.react.diagrams.BaseModelListener
 import se.iimetra.dataflowgram.wrappers.react.diagrams.DiagramEngine
 import se.iimetra.dataflowgram.wrappers.react.diagrams.diagramWidget
+import se.iimetra.dataflowgram.wrappers.react.diagrams.models.NodeModel
+import kotlin.browser.document
+import kotlin.browser.window
 
 class Scene : RComponent<Scene.Props, RState>() {
 
@@ -22,6 +29,7 @@ class Scene : RComponent<Scene.Props, RState>() {
       div("scene__inner") {
         attrs {
           onDropFunction = { e ->
+            props.engine.addNode(e)
             props.updateDiagram()
           }
           onDragOverFunction = { it.preventDefault() }
@@ -40,9 +48,29 @@ class Scene : RComponent<Scene.Props, RState>() {
     }
   }
 
+  private fun DiagramEngine.addNode(e: Event): NodeModel? {
+    val node = props.sceneTransfer.getDto()
+    val point = getRelativeMousePoint(e)
+
+    node.setPosition(point.x, point.y)
+
+    node.addListener(
+      BaseModelListener().events {
+        this.selectionChanged = {
+          console.log("*****!*****")
+          props.updateDiagram()
+        }
+      }
+    )
+
+    getDiagramModel().addNode(node)
+    return node
+  }
+
   interface Props : RProps {
     var engine: DiagramEngine
     var updateDiagram: () -> Unit
+    var sceneTransfer: SceneTransferObject
   }
 }
 

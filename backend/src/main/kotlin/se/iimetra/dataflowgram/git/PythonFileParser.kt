@@ -26,7 +26,7 @@ class PythonFileParser {
 
   private fun extractFunction(lines: List<String>, imports: List<String>): CustomFunction {
     val signature = find(signaturePattern, lines) {
-      FunctionSignature(group(1).split(",").toList(), group(2))
+      FunctionSignature(group(1).split(",").map { it.trim() }.toList(), group(2))
     }
     val params = find(paramsPattern, lines) { group(1) }
     val description = find(descriptionPattern, lines) { group(1) }
