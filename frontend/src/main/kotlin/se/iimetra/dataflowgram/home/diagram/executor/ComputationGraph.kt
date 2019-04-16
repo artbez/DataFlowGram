@@ -9,10 +9,9 @@ import se.iimetra.dataflowgram.wrappers.react.diagrams.models.NodeModel
 
 class ComputationGraph(val nodes: List<NodeModel>, panel: DiagramExecutionPanel) {
 
-  private val executors: List<AbstractNodeExecutor>
+  val executors: List<AbstractNodeExecutor>
 
   init {
-    nodes.forEach { it.setSelected(false) }
     val executorMap = nodes.map { it.getID() to DefaultNodeExecutor(it, panel) }.toMap()
     nodes.forEach { sourceNode ->
       sourceNode.outLinks().forEach {

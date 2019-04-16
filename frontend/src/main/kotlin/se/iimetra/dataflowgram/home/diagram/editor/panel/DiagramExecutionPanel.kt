@@ -2,9 +2,12 @@ package se.iimetra.dataflowgram.home.diagram.editor.panel
 
 import se.iimetra.dataflowgram.wrappers.react.diagrams.models.NodeModel
 
-class DiagramExecutionPanel(val onChange: (List<ExecutionState>) -> Unit) {
+class DiagramExecutionPanel(
+  var onChange: (List<ExecutionState>) -> Unit,
+  val onClose: () -> Unit
+) {
 
-  private val executionList: MutableList<ExecutionState> = mutableListOf()
+  val executionList: MutableList<ExecutionState> = mutableListOf()
 
   fun <T : NodeModel> startNode(node: T) {
     executionList.add(ExecutionState(node))

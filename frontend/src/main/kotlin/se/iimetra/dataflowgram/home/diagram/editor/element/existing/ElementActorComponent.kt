@@ -21,7 +21,7 @@ class ElementActorComponent : RComponent<ElementActorComponent.Props, RState>() 
         attrs.onClickFunction = { event ->
           event.stopPropagation()
           event.preventDefault()
-          executionService.cached(props.engine, props.selectedNode)
+          executionService.cached(props.selectedNode)
           props.updateDiagram()
         }
         +"Cached"
@@ -30,7 +30,7 @@ class ElementActorComponent : RComponent<ElementActorComponent.Props, RState>() 
         attrs.onClickFunction = { event ->
           event.stopPropagation()
           event.preventDefault()
-          executionService.all(props.engine, props.selectedNode)
+          executionService.all(props.selectedNode)
           props.updateDiagram()
         }
         +"Full"

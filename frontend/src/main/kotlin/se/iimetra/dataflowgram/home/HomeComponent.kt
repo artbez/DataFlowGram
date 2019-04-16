@@ -35,7 +35,7 @@ class HomeComponent : RComponent<RProps, RState>() {
   override fun RBuilder.render() {
     header
     div("row home-all") {
-      div("col-md-2") {
+      div("col-md-2 container-scroll") {
         editor {
           attrs {
             engine = this@HomeComponent.engine
@@ -53,7 +53,7 @@ class HomeComponent : RComponent<RProps, RState>() {
           }
         }
       }
-      div("col-md-3") {
+      div("col-md-3 container-scroll") {
         palette {
           attrs { }
         }

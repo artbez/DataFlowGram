@@ -4,25 +4,39 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import se.iimetra.dataflowgram.home.diagram.editor.panel.DiagramExecutionPanel
 import se.iimetra.dataflowgram.home.neighbors
+import se.iimetra.dataflowgram.home.selectAllNodes
 import se.iimetra.dataflowgram.wrappers.react.diagrams.DiagramEngine
 import se.iimetra.dataflowgram.wrappers.react.diagrams.models.NodeModel
 
 class ExecutionService {
-  fun cached(engine: DiagramEngine, node: NodeModel) {
 
-  }
+  val executionMap = mutableMapOf<String, DiagramExecutionPanel>()
 
-  fun all(engine: DiagramEngine, node: NodeModel) {
+  fun cached(node: NodeModel) {
     val nodes = node.selectAllNodes()
-    val cgraph = ComputationGraph(nodes, DiagramExecutionPanel {})
-    GlobalScope.launch { cgraph.execute {  } }
+    if (nodes.any { executionMap.keys.contains(it.getID()) }) {
+      throw Exception("Impossible to take one node in several executions")
+    }
   }
 
-  private fun NodeModel.selectAllNodes(): List<NodeModel> {
-    val nearNodes = neighbors()
-      .filterNot { it.isSelected() }
-      .map { it.also { it.setSelected(true) } }
+  fun all(node: NodeModel) {
+    val nodes = node.selectAllNodes()
+    if (nodes.any { executionMap.keys.contains(it.getID()) }) {
+      throw Exception("Impossible to take one node in several executions!")
+    }
 
-    return nearNodes.plus(this).plus(nearNodes.flatMap { it.selectAllNodes() }).distinctBy { it.getID() }
+    val panel = DiagramExecutionPanel({}) {
+      nodes.forEach { executionMap.remove(it.getID()) }
+    }
+    nodes.forEach { executionMap[it.getID()] = panel }
+
+    val cgraph = ComputationGraph(nodes, panel)
+    if (cgraph.executors.isNotEmpty()) {
+      GlobalScope.launch {
+        cgraph.execute {}
+      }
+    } else {
+      nodes.forEach { executionMap.remove(it.getID()) }
+    }
   }
 }

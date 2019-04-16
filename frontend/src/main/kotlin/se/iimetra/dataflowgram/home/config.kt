@@ -42,6 +42,14 @@ fun NodeModel.neighbors() = getPorts().toMap().values.map { it as InitialPortMod
   .map { it.getNode() }
   .filter { it.getID() != this.getID() }
 
+fun NodeModel.selectAllNodes(): List<NodeModel> {
+  val nearNodes = neighbors()
+    .filterNot { it.isSelected() }
+    .map { it.also { it.setSelected(true) } }
+
+  return nearNodes.plus(this).plus(nearNodes.flatMap { it.selectAllNodes() }).distinctBy { it.getID() }
+}
+
 fun NodeModel.inPorts() = getPorts().toMap().values.map { it as InitialPortModel }.filter { it.type == PortType.In }
 
 fun NodeModel.outPorts() = getPorts().toMap().values.map { it as InitialPortModel }.filter { it.type == PortType.Out }

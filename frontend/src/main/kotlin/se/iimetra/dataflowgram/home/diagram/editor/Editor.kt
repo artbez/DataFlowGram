@@ -9,7 +9,10 @@ import se.iimetra.dataflow.FunctionDescription
 import se.iimetra.dataflowgram.home.diagram.SceneTransferObject
 import se.iimetra.dataflowgram.home.diagram.editor.element.existing.diaElemView
 import se.iimetra.dataflowgram.home.diagram.editor.element.new.functionDescriptionView
+import se.iimetra.dataflowgram.home.diagram.editor.panel.DiagramExecutionPanel
+import se.iimetra.dataflowgram.home.diagram.editor.panel.diagramPanel
 import se.iimetra.dataflowgram.home.diagram.node.InitDefaultNode
+import se.iimetra.dataflowgram.home.executionService
 import se.iimetra.dataflowgram.home.paletteChoseController
 import se.iimetra.dataflowgram.utils.toMap
 import se.iimetra.dataflowgram.wrappers.react.diagrams.DiagramEngine
@@ -25,14 +28,19 @@ class Editor : RComponent<Editor.Props, Editor.State>() {
 
   override fun componentWillReceiveProps(nextProps: Props) {
     val selectedNodes = nextProps.engine.getDiagramModel().getNodes().toMap().values.filter { it.isSelected() }
+    val execMap = executionService.executionMap
     if (selectedNodes.isNotEmpty()) {
       val elem = selectedNodes[0]
       setState {
         paletteChosen = null
         selectedNode = elem
+        executionPanel = execMap[elem.getID()]
       }
     } else {
-      setState { selectedNode = null }
+      setState {
+        selectedNode = null
+        executionPanel = execMap.values.firstOrNull()
+      }
     }
   }
 
@@ -44,6 +52,7 @@ class Editor : RComponent<Editor.Props, Editor.State>() {
   override fun componentDidMount() {
     paletteChoseController.addListener {
       setState {
+        executionPanel = null
         selectedNode = null
         paletteChosen = it
       }
@@ -53,12 +62,13 @@ class Editor : RComponent<Editor.Props, Editor.State>() {
   interface State : RState {
     var paletteChosen: FunctionDescription?
     var selectedNode: NodeModel?
+    var executionPanel: DiagramExecutionPanel?
   }
 
   override fun RBuilder.render() {
     div("home-left") {
       h4("home-left__title") {
-        +"Configurer"
+        if (state.executionPanel != null) +"ExecutionPanel" else +"Configurer"
       }
       hr("home-left__line") { }
       if (state.paletteChosen != null) {
@@ -68,7 +78,15 @@ class Editor : RComponent<Editor.Props, Editor.State>() {
             sceneTransferObject = props.sceneTransfer
           }
         }
-      } else if (state.selectedNode != null) {
+      } else if (state.executionPanel != null) {
+        diagramPanel {
+          attrs {
+            updateDiagram = props.updateDiagram
+            diagramExecutionPanel = state.executionPanel!!
+          }
+        }
+      }
+      else if (state.selectedNode != null) {
         diaElemView {
           attrs {
             function = (state.selectedNode as InitDefaultNode).function

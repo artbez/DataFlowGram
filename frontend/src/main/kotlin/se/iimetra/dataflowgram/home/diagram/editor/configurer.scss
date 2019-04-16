@@ -57,11 +57,22 @@ $blue_color: rgb(0, 192, 255);
   max-width: 100rem;
 }
 
+.execution-panel-block {
+  font-size: 16px;
+}
+
 .execution-state-element {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   margin-top: 2rem;
+
+  &__state {
+    font-size: 16px;
+    //display: flex;
+    //justify-content: center; /* align horizontal */
+    //align-items: center; /* align vertical */
+  }
 }
 
 .complete-and-log {
