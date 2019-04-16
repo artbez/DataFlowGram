@@ -54,7 +54,7 @@ class GitConnector(remoteRepo: String) {
       category.files.flatMap { file ->
         file.functions.map {
           FunctionDescription(
-            FunctionMeta(it.signature, it.params, it.description),
+            FunctionMeta(it.signature, it.params, it.description, version.get()),
             FunctionTextView(FunctionId(category.name, file.name, it.name), it.args, it.lines, it.imports)
           )
         }

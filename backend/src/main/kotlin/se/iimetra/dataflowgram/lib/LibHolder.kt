@@ -6,6 +6,8 @@ import se.iimetra.dataflow.FunctionDescription
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.nio.file.StandardOpenOption
+import java.util.regex.Matcher
+import java.util.regex.Pattern
 
 class LibHolder {
   private val libLock = Mutex()
@@ -44,7 +46,12 @@ class LibHolder {
     Files.write(libFile, imports.filterNot { it.isBlank() }.joinToString("\n").toByteArray(),  StandardOpenOption.APPEND)
 
     val wholeBody = functions.map { func ->
-      func.view.content
+      val pattern = Pattern.compile("def (.*?)\\((.*?)\\):")
+      //val firstLine = "def ${func.fullName()}(${func.view.args}):"
+      func.view.content.map { str ->
+        val m = pattern.matcher(str)
+        if (m.find()) str.replace(m.group(1), func.fullName()) else str
+      }
     }.filterNot { it.isNullOrEmpty() }.joinToString("\n\n") { it.joinToString("\n") }
 
     Files.write(libFile, "\n$wholeBody\n".toByteArray(), StandardOpenOption.APPEND)

@@ -8,12 +8,12 @@ import org.springframework.web.reactive.socket.WebSocketHandler
 import org.springframework.web.reactive.socket.server.support.WebSocketHandlerAdapter
 
 @Configuration
-class ReactiveWebSocketConfiguration(val trainWsHandler: TrainWSHandler) {
+class ReactiveWebSocketConfiguration(val mainWsHandler: MainWSHandler) {
 
   @Bean
   fun webSocketHandlerMapping(): HandlerMapping {
     val map = HashMap<String, WebSocketHandler?>()
-    map["/api/ws/all"] = trainWsHandler
+    map["/api/ws/all"] = mainWsHandler
 
     val handlerMapping = SimpleUrlHandlerMapping()
     handlerMapping.order = 1

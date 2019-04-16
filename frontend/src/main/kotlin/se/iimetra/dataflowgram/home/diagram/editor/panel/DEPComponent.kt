@@ -70,6 +70,9 @@ class DEPComponent(override var props: Props) : RComponent<DEPComponent.Props, D
             onClickFunction = {
               it.preventDefault()
               it.stopPropagation()
+              props.diagramExecutionPanel.canProcess = false
+              props.diagramExecutionPanel.onClose()
+              props.updateDiagram()
             }
           }
           +"Cancel"

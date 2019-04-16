@@ -40,7 +40,9 @@ class Worker {
           client.update()
         }
         is WorkerAction.Execute -> {
+          logger.info("Executing ${action.function.name}")
           val ref = client.executeCommand(action.function, action.arguments, action.params)
+          logger.info("${action.function.name} executed")
           action.result.complete(ref)
         }
         is WorkerAction.CreateFile -> {

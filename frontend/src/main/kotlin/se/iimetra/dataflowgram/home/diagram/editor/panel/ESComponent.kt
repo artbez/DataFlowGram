@@ -59,47 +59,6 @@ class ESComponent : RComponent<ESComponent.Props, RState>() {
         }
       }
     }
-//    div("execution-state-element") {
-//      div("node_item") {
-//        div("node_item__widget") {
-//          createWidget(props.state.node)
-//        }
-//      }
-//      div("execution-state-element__state") {
-//        if (props.state.completed) +"Completed" else +"Executing..."
-//      }
-     //div("complete-and-log") {
-
-//        div {
-//          if (props.state.logs != null) {
-//            OverlayTrigger {
-//              attrs {
-//                trigger = "click"
-//                placement = "right"
-//                overlay = buildElement {
-//                  Popover {
-//                    attrs {
-//                      id = "popover-select-pretrained"
-//                      title = "Logs"
-//                    }
-//                    div("log-box") {
-//                      props.state.logs!!.forEach {
-//                        div {
-//                          +it
-//                        }
-//                      }
-//                    }
-//                  }
-//                }!!
-//              }
-//              button(classes = "log-section") {
-//                logIcon("log-section__icon") { }
-//              }
-//            }
-//          }
-//        }
-     // }
-   // }
   }
 
   interface Props : RProps {

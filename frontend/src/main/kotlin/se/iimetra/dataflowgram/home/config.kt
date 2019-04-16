@@ -4,6 +4,7 @@ import kotlinx.serialization.ImplicitReflectionSerializer
 import se.iimetra.dataflowgram.home.controllers.ConfigController
 import se.iimetra.dataflowgram.home.controllers.EventController
 import se.iimetra.dataflowgram.home.controllers.PaletteChoseController
+import se.iimetra.dataflowgram.home.controllers.ServerEventController
 import se.iimetra.dataflowgram.home.diagram.executor.ExecutionService
 import se.iimetra.dataflowgram.home.diagram.node.DefaultNodeFactory
 import se.iimetra.dataflowgram.home.diagram.node.ports.InitialPortModel
@@ -25,6 +26,7 @@ fun DiagramEngine.setup(): DiagramEngine {
   return this
 }
 
+val serverEventController = ServerEventController()
 val configController = ConfigController()
 val paletteChoseController = PaletteChoseController()
 val executionService = ExecutionService()

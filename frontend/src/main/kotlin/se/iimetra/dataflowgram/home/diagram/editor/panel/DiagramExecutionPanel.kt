@@ -7,6 +7,14 @@ class DiagramExecutionPanel(
   val onClose: () -> Unit
 ) {
 
+  companion object {
+    var nextPanelId = 0L
+  }
+
+  var canProcess = true
+
+  val panelId = nextPanelId++
+
   val executionList: MutableList<ExecutionState> = mutableListOf()
 
   fun <T : NodeModel> startNode(node: T) {

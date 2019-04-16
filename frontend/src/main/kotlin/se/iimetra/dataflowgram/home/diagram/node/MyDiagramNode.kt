@@ -25,7 +25,7 @@ class InitDefaultNode(val function: FunctionDescription) : NodeModel("default", 
       addPort(model)
     }
     if (function.meta.signature.output != "Unit") {
-      outPort = InitialPortModel(function.meta.signature.output, PortType.Out, 5)
+      outPort = InitialPortModel(function.meta.signature.output, PortType.Out, -1)
       addPort(outPort!!)
     }
   }
