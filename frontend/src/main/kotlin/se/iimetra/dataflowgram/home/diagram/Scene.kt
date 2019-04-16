@@ -57,7 +57,6 @@ class Scene : RComponent<Scene.Props, RState>() {
     node.addListener(
       BaseModelListener().events {
         this.selectionChanged = {
-          console.log("*****!*****")
           props.updateDiagram()
         }
       }

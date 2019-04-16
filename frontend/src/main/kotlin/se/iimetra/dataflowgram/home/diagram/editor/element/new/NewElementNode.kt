@@ -1,4 +1,4 @@
-package se.iimetra.dataflowgram.home.diagram.editor
+package se.iimetra.dataflowgram.home.diagram.editor.new
 
 import kotlinx.html.Draggable
 import kotlinx.html.draggable

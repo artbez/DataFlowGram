@@ -30,7 +30,6 @@ class CategoryBlock : RComponent<CategoryBlock.Props, RState>() {
       }
 
       hr("palette__block__line") {}
-      console.log(Json.plain.stringify(props.content))
       TreeView {
         attrs {
           id = "treeview"

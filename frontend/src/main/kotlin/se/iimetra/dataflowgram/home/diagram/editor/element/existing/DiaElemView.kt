@@ -1,25 +1,37 @@
-package se.iimetra.dataflowgram.home.diagram.editor
+package se.iimetra.dataflowgram.home.diagram.editor.element.existing
 
+import kotlinx.html.js.onClickFunction
 import react.*
 import react.dom.*
 import se.iimetra.dataflow.FunctionDescription
 import se.iimetra.dataflow.toMathText
 import se.iimetra.dataflowgram.dom.logIcon
-import se.iimetra.dataflowgram.home.diagram.SceneTransferObject
-import se.iimetra.dataflowgram.home.diagram.node.DefaultNodeFactory
-import se.iimetra.dataflowgram.home.diagram.node.defaultNodeWidget
+import se.iimetra.dataflowgram.utils.toMap
 import se.iimetra.dataflowgram.wrappers.react.bootstrap.OverlayTrigger
 import se.iimetra.dataflowgram.wrappers.react.bootstrap.Popover
+import se.iimetra.dataflowgram.wrappers.react.diagrams.DiagramEngine
+import se.iimetra.dataflowgram.wrappers.react.diagrams.models.NodeModel
 
-class FunctionDescriptionView : RComponent<FunctionDescriptionView.Props, RState>() {
+class DiaElemView : RComponent<DiaElemView.Props, RState>() {
 
   interface Props : RProps {
     var function: FunctionDescription
-    var sceneTransferObject: SceneTransferObject
+    var selectedNode: NodeModel
+    var engine: DiagramEngine
+    var updateDiagram: () -> Unit
   }
 
   override fun RBuilder.render() {
     div("configurer-props") {
+      div("configurer-props__group") {
+        elementActor {
+          attrs {
+            selectedNode = props.selectedNode
+            engine = props.engine
+            updateDiagram = props.updateDiagram
+          }
+        }
+      }
       div("configurer-props__group") {
         b { +"Function:" }
         span { +"${props.function.view.id.name}(${props.function.view.args})" }
@@ -65,25 +77,9 @@ class FunctionDescriptionView : RComponent<FunctionDescriptionView.Props, RState
           }
         }
       }
-      div("configurer-props__group") {
-        b { +"Drag to Scene:" }
-        editorNode {
-          attrs {
-            label = props.function.view.id.name
-            sceneTransfer = props.sceneTransferObject
-            this.nodeProducer = {  DefaultNodeFactory.instance.getNewInstance(props.function) }
-          }
-          defaultNodeWidget {
-            attrs {
-              this.defaultNode = DefaultNodeFactory.instance.getNewInstance(props.function)
-              isView = true
-            }
-          }
-        }
-      }
     }
   }
 }
 
-fun RBuilder.functionDescriptionView(handler: RHandler<FunctionDescriptionView.Props>)
-    = child(FunctionDescriptionView::class, handler)
+fun RBuilder.diaElemView(handler: RHandler<DiaElemView.Props>)
+    = child(DiaElemView::class, handler)

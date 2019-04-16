@@ -1,51 +1,26 @@
-package se.iimetra.dataflowgram.home.diagram.editor
+package se.iimetra.dataflowgram.home.diagram.editor.element.new
 
-import kotlinx.html.js.onClickFunction
 import react.*
 import react.dom.*
 import se.iimetra.dataflow.FunctionDescription
 import se.iimetra.dataflow.toMathText
 import se.iimetra.dataflowgram.dom.logIcon
-import se.iimetra.dataflowgram.utils.toMap
+import se.iimetra.dataflowgram.home.diagram.SceneTransferObject
+import se.iimetra.dataflowgram.home.diagram.editor.new.editorNode
+import se.iimetra.dataflowgram.home.diagram.node.DefaultNodeFactory
+import se.iimetra.dataflowgram.home.diagram.node.defaultNodeWidget
 import se.iimetra.dataflowgram.wrappers.react.bootstrap.OverlayTrigger
 import se.iimetra.dataflowgram.wrappers.react.bootstrap.Popover
-import se.iimetra.dataflowgram.wrappers.react.diagrams.DiagramEngine
-import se.iimetra.dataflowgram.wrappers.react.diagrams.models.NodeModel
 
-class DiaElemView : RComponent<DiaElemView.Props, RState>() {
+class FunctionDescriptionView : RComponent<FunctionDescriptionView.Props, RState>() {
 
   interface Props : RProps {
     var function: FunctionDescription
-    var selectedNode: NodeModel
-    var engine: DiagramEngine
-    var updateDiagram: () -> Unit
+    var sceneTransferObject: SceneTransferObject
   }
 
   override fun RBuilder.render() {
     div("configurer-props") {
-      div("configurer-props__group") {
-        b { +"Remove" }
-        div {
-          button(classes = "editor_button btn-danger") {
-            attrs.onClickFunction = { event ->
-              event.stopPropagation()
-              event.preventDefault()
-              props.selectedNode.getPorts().toMap().forEach { it ->
-                it.value.getLinks().toMap().forEach {
-                  val source = it.value.getSourcePort()
-                  val target = it.value.getTargetPort()
-                  source.removeLink(it.value)
-                  target.removeLink(it.value)
-                  props.engine.getDiagramModel().removeLink(it.value)
-                }
-              }
-              props.engine.getDiagramModel().removeNode(props.selectedNode)
-              props.updateDiagram()
-            }
-            +"Remove"
-          }
-        }
-      }
       div("configurer-props__group") {
         b { +"Function:" }
         span { +"${props.function.view.id.name}(${props.function.view.args})" }
@@ -91,9 +66,25 @@ class DiaElemView : RComponent<DiaElemView.Props, RState>() {
           }
         }
       }
+      div("configurer-props__group") {
+        b { +"Drag to Scene:" }
+        editorNode {
+          attrs {
+            label = props.function.view.id.name
+            sceneTransfer = props.sceneTransferObject
+            this.nodeProducer = {  DefaultNodeFactory.instance.getNewInstance(props.function) }
+          }
+          defaultNodeWidget {
+            attrs {
+              this.defaultNode = DefaultNodeFactory.instance.getNewInstance(props.function)
+              isView = true
+            }
+          }
+        }
+      }
     }
   }
 }
 
-fun RBuilder.diaElemView(handler: RHandler<DiaElemView.Props>)
-    = child(DiaElemView::class, handler)
+fun RBuilder.functionDescriptionView(handler: RHandler<FunctionDescriptionView.Props>)
+    = child(FunctionDescriptionView::class, handler)

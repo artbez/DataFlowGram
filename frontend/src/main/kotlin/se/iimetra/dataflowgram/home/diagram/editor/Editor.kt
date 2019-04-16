@@ -1,13 +1,14 @@
 package se.iimetra.dataflowgram.home.diagram.editor
 
 import kotlinext.js.invoke
-import org.w3c.dom.Node
 import react.*
 import react.dom.div
 import react.dom.h4
 import react.dom.hr
 import se.iimetra.dataflow.FunctionDescription
 import se.iimetra.dataflowgram.home.diagram.SceneTransferObject
+import se.iimetra.dataflowgram.home.diagram.editor.element.existing.diaElemView
+import se.iimetra.dataflowgram.home.diagram.editor.element.new.functionDescriptionView
 import se.iimetra.dataflowgram.home.diagram.node.InitDefaultNode
 import se.iimetra.dataflowgram.home.paletteChoseController
 import se.iimetra.dataflowgram.utils.toMap

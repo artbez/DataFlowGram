@@ -44,8 +44,13 @@ $blue_color: rgb(0, 192, 255);
   min-width: 2rem;
 }
 
-.editor_button {
-  width: 7rem;
+.actor-existing {
+  display: flex;
+  justify-content: space-between;
+
+  .editor_button {
+    width: 6rem;
+  }
 }
 
 #popover-select-pretrained {

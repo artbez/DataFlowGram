@@ -59,9 +59,5 @@ class HomeComponent : RComponent<RProps, RState>() {
         }
       }
     }
-    paletteChoseController.addListener {
-      console.log("H")
-      console.log(it)
-    }
   }
 }
