@@ -15,7 +15,10 @@ class PaletteChoseController {
   }
 
   fun newChoose(newId: String) {
-    choosen = configController.gitContent.functions.firstOrNull {
+    choosen = configController.gitContent.serverSpace.functions.firstOrNull {
+      it.fullId() == newId
+    }
+    choosen = configController.gitContent.clientSpace.functions.firstOrNull {
       it.fullId() == newId
     }
     choosen?.let { ch -> listeners.forEach { it.invoke(ch) } }

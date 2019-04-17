@@ -5,7 +5,6 @@ import kotlinx.serialization.Serializable
 import react.*
 import react.dom.div
 import se.iimetra.dataflow.FunctionDescription
-import se.iimetra.dataflow.FunctionId
 import se.iimetra.dataflow.fullId
 import se.iimetra.dataflow.toMathText
 import se.iimetra.dataflowgram.home.configController
@@ -18,13 +17,15 @@ import se.iimetra.dataflowgram.wrappers.react.tabs.Tabs
 class Palette : RComponent<RProps, Palette.State>() {
 
   override fun State.init() {
-    categories = emptyList()
+    serverCategories = emptyList()
+    clientCategories = emptyList()
   }
 
   override fun componentDidMount() {
     configController.addListener { newConfig ->
       setState {
-        categories = toViewCategories(newConfig.functions)
+        serverCategories = toViewCategories(newConfig.serverSpace.functions)
+        clientCategories = toViewCategories(newConfig.clientSpace.functions)
       }
     }
   }
@@ -47,8 +48,8 @@ class Palette : RComponent<RProps, Palette.State>() {
           }
         }
         TabPanel {
-          if (state.categories.isNotEmpty()) {
-            state.categories.forEach {
+          if (state.serverCategories.isNotEmpty()) {
+            state.serverCategories.forEach {
               categoryBlock {
                 attrs {
                   name = it.category
@@ -59,14 +60,24 @@ class Palette : RComponent<RProps, Palette.State>() {
           }
         }
         TabPanel {
-          +"b2"
+          if (state.clientCategories.isNotEmpty()) {
+            state.clientCategories.forEach {
+              categoryBlock {
+                attrs {
+                  name = it.category
+                  content = it.cells
+                }
+              }
+            }
+          }
         }
       }
     }
   }
 
   interface State : RState {
-    var categories: List<ViewCategory>
+    var serverCategories: List<ViewCategory>
+    var clientCategories: List<ViewCategory>
   }
 
   private fun toViewCategories(functions: List<FunctionDescription>): List<ViewCategory> {

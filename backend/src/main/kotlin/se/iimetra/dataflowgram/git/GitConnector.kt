@@ -16,7 +16,8 @@ class GitConnector(remoteRepo: String) {
   private val localRepoDirectory = Paths.get("repo")
   private val listeners = mutableListOf<GitListener>()
   private val git: Git
-  private val parser = PythonFileParser()
+  private val pyParser = PythonFileParser()
+  private val jsParser = JsFileParser()
   private val version = AtomicLong(0)
 
   init {
@@ -28,14 +29,14 @@ class GitConnector(remoteRepo: String) {
   }
 
   fun start() = GlobalScope.launch {
-    listeners.forEach { it.parseUpdate(GitContent(version.get(), lastVersion())) }
+    listeners.forEach { it.parseUpdate(GitContent(version.get(), lastVersion(true), lastVersion(false))) }
 
     while (true) {
       delay(3000)
       val updates = git.pull().call().fetchResult.trackingRefUpdates.isNotEmpty()
       if (updates) {
         version.incrementAndGet()
-        listeners.forEach { it.parseUpdate(GitContent(version.get(), lastVersion())) }
+        listeners.forEach { it.parseUpdate(GitContent(version.get(), lastVersion(true), lastVersion(false))) }
       }
     }
   }
@@ -44,35 +45,37 @@ class GitConnector(remoteRepo: String) {
     listeners.add(listener)
   }
 
-  private fun lastVersion(): List<FunctionDescription> {
-    val categories = Files.list(localRepoDirectory)
+  private fun lastVersion(isPython: Boolean): SpaceContent {
+    val dir = if (isPython) Paths.get("repo/python") else Paths.get("repo/js")
+
+    val categories = Files.list(dir)
       .filter { Files.isDirectory(it) && !it.fileName.toString().startsWith(".") }
-      .map { directory -> processCategory(directory) }
+      .map { directory -> processCategory(directory, isPython) }
       .toList()
 
-    return categories.flatMap { category ->
+    return SpaceContent(categories.flatMap { category ->
       category.files.flatMap { file ->
         file.functions.map {
           FunctionDescription(
-            FunctionMeta(it.signature, it.params, it.description, version.get()),
+            FunctionMeta(it.signature, it.params, it.description, version.get(), if (isPython) "python" else "js"),
             FunctionTextView(FunctionId(category.name, file.name, it.name), it.args, it.lines, it.imports)
           )
         }
       }
-    }
+    })
   }
 
-  private fun processCategory(path: Path): CategoryContent {
+  private fun processCategory(path: Path, isPython: Boolean): CategoryContent {
     val data = Files.list(path)
       .filter { Files.isRegularFile(it) }
-      .map { leaf -> FileContent(leaf.shortFileName(), processFile(leaf)) }
+      .map { leaf -> FileContent(leaf.shortFileName(), processFile(leaf, isPython)) }
       .toList()
     return CategoryContent(path.fileName.toString(), data)
   }
 
-  private fun processFile(path: Path): List<CustomFunction> {
+  private fun processFile(path: Path, isPython: Boolean): List<CustomFunction> {
     val lines = Files.readAllLines(path)
-    return parser.parse(lines)
+    return if (isPython) pyParser.parse(lines) else jsParser.parse(lines)
   }
 
   private fun removeDirectory(directory: Path) {

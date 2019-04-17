@@ -19,7 +19,7 @@ class RootDispatcher : GitListener {
   }
 
   override suspend fun parseUpdate(newContent: GitContent) {
-    val updated = cache.update(newContent)
+    val updated = cache.update(newContent.version, newContent.serverSpace.functions)
     libHolder.updateLib(updated)
     worker.update()
   }

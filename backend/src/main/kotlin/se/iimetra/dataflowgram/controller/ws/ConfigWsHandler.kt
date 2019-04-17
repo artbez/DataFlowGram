@@ -8,13 +8,14 @@ import kotlinx.serialization.stringify
 import org.springframework.web.reactive.socket.WebSocketSession
 import reactor.core.publisher.Mono
 import se.iimetra.dataflow.GitContent
+import se.iimetra.dataflow.SpaceContent
 import se.iimetra.dataflow.WsResponse
 import se.iimetra.dataflowgram.git.GitListener
 import java.util.concurrent.CopyOnWriteArrayList
 
 class ConfigWsHandler : GitListener {
   @Volatile
-  private var currentConfig: GitContent = GitContent(-1, emptyList())
+  private var currentConfig: GitContent = GitContent(-1, SpaceContent(emptyList()), SpaceContent(emptyList()))
 
   private val sessions = CopyOnWriteArrayList<WebSocketSession>()
 

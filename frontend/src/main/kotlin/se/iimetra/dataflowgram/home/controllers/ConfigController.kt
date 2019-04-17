@@ -4,6 +4,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import se.iimetra.dataflow.GitContent
+import se.iimetra.dataflow.SpaceContent
 import se.iimetra.dataflowgram.utils.get
 
 interface ConfigUpdateListener {
@@ -12,7 +13,7 @@ interface ConfigUpdateListener {
 
 class ConfigController {
 
-  var gitContent = GitContent(-1, emptyList())
+  var gitContent = GitContent(-1, SpaceContent(emptyList()), SpaceContent(emptyList()))
   private val listeners = mutableListOf<(GitContent) -> Unit>()
 
   fun push(git: GitContent) {

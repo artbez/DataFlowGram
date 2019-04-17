@@ -1,19 +1,16 @@
 package se.iimetra.dataflowgram.home
 
 import kotlinext.js.invoke
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.parse
-import react.*
+import react.RBuilder
+import react.RComponent
+import react.RProps
+import react.RState
 import react.dom.div
-import se.iimetra.dataflow.GitContent
 import se.iimetra.dataflowgram.header.header
 import se.iimetra.dataflowgram.home.diagram.SceneTransferObject
 import se.iimetra.dataflowgram.home.diagram.editor.editor
 import se.iimetra.dataflowgram.home.diagram.palette.palette
 import se.iimetra.dataflowgram.home.diagram.scene
-import se.iimetra.dataflowgram.utils.get
 import se.iimetra.dataflowgram.wrappers.react.diagrams.DiagramEngine
 
 class HomeComponent : RComponent<RProps, RState>() {
