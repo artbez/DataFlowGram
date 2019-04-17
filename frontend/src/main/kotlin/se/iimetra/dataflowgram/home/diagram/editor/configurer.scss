@@ -58,6 +58,8 @@ $blue_color: rgb(0, 192, 255);
 }
 
 .execution-panel-block {
+  overflow-y: scroll;
+  max-height: 90rem;
   font-size: 16px;
 }
 
@@ -124,5 +126,15 @@ $blue_color: rgb(0, 192, 255);
 
   &__out {
     background-color: $blue_color;
+  }
+}
+
+#popover-select-output {
+  max-width: 100rem;
+  min-width: 40rem;
+  min-height: 20rem;
+
+  pre {
+    min-height: 20rem;
   }
 }

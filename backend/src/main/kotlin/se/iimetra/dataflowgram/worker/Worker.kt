@@ -41,7 +41,7 @@ class Worker {
         }
         is WorkerAction.Execute -> {
           logger.info("Executing ${action.function.name}")
-          val ref = client.executeCommand(action.function, action.arguments, action.params)
+          val ref = client.executeCommand(action.function, action.arguments, action.params, action.onMessageReceive)
           logger.info("${action.function.name} executed")
           action.result.complete(ref)
         }
@@ -66,9 +66,9 @@ class Worker {
     actionQueue.send(WorkerAction.Update)
   }
 
-  suspend fun execute(function: FunctionId, args: List<String>, params: Map<String, String>): CompletableFuture<String> {
+  suspend fun execute(function: FunctionId, args: List<String>, params: Map<String, String>, onMessageReceive: (String) -> Unit): CompletableFuture<String> {
     val future = CompletableFuture<String>()
-    actionQueue.send(WorkerAction.Execute(function, args, params, future))
+    actionQueue.send(WorkerAction.Execute(function, args, params, onMessageReceive, future))
     return future
   }
 

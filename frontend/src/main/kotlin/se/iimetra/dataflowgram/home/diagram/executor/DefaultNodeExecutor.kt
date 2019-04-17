@@ -24,9 +24,13 @@ class DefaultNodeExecutor(node: NodeModel, var panel: DiagramExecutionPanel) : A
       val panelId = panel.panelId
       val executionIndex = panel.executionList.size
       serverEventController.addListener({ it.executionPanelId == panelId && it.blockIndex == executionIndex }) { response ->
-        GlobalScope.launch {
-          panel.stopNode(node)
-          outData?.setValue(response.ref)
+        if (response.msg != null) {
+          panel.update(node, response.msg)
+        } else {
+          GlobalScope.launch {
+            panel.stopNode(node)
+            outData?.setValue(response.ref)
+          }
         }
       }
       eventController.pushServerEvent(

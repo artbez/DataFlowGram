@@ -40,11 +40,12 @@ class RootDispatcher : GitListener {
     function: FunctionId,
     args: List<String>,
     version: Long,
-    params: Map<String, String> = emptyMap()
+    params: Map<String, String> = emptyMap(),
+    onMessageReceive: (String) -> Unit
   ): CompletableFuture<String> {
     if (!cache.check(function, version)) {
       return CompletableFuture.supplyAsync { throw Exception() }
     }
-    return worker.execute(function, args, params)
+    return worker.execute(function, args, params, onMessageReceive)
   }
 }

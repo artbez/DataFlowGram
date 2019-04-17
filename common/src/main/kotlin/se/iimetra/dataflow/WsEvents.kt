@@ -19,16 +19,10 @@ data class ServerEventRequest(
 )
 
 @Serializable
-data class ServerMsgEventResponse(
-  val executionPanelId: Long,
-  val blockIndex: Int,
-  val msg: String
-)
-
-@Serializable
 data class ServerResultEventResponse(
   val executionPanelId: Long,
   val blockIndex: Int,
-  val ref: String
+  val msg: String?,
+  val ref: String?
 )
 

@@ -13,7 +13,10 @@ message ExecutionRequest {
 }
 
 message ExecutionResult {
-    string ref = 1;
+    oneof value {
+        string msg = 1;
+        string ref = 2;
+    }
 }
 
 message OutRequest {
@@ -25,7 +28,7 @@ message OutResult {
 }
 
 service Executor {
-    rpc Execute (ExecutionRequest) returns (ExecutionResult) {}
+    rpc Execute (ExecutionRequest) returns (stream ExecutionResult) {}
     rpc Out (OutRequest) returns (OutResult) {}
     rpc UpdateLib (Update) returns (Updated) {}
 }

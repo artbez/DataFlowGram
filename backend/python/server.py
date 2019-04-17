@@ -1,9 +1,14 @@
+import queue
+import threading
 from concurrent import futures
 import time
 import logging
 import os
+from typing import Generator
 
 import grpc
+import sys
+
 import sys
 
 import connector_pb2
@@ -23,15 +28,45 @@ def init_file(params):
     return params['path']
 
 
+class ThreadWithReturnValue(threading.Thread):
+    def __init__(self, arg):
+        threading.Thread.__init__(self)
+        self.arg = arg
+        self._return = None
+
+    def run(self):
+        self._return = eval(self.arg)
+
+    def join(self, *args):
+        threading.Thread.join(self, *args)
+        return self._return
+
+
 class ExecutionService(connector_pb2_grpc.ExecutorServicer):
+
     def Execute(self, request, context):
         global global_vars
         parsed = list(map(lambda x: 'global_vars[\'' + x + '\']', request.args))
-
         arg_string = ",".join(parsed)
         params = request.params
+
+        q = queue.Queue()
+        log = Logger(q)
         if params is None or params == {}:
-            res = eval('myc.' + request.function + '(' + arg_string + ')')
+
+            old_stdout = sys.stdout
+            sys.stdout = log
+            foo = ThreadWithReturnValue('myc.' + request.function + '(' + arg_string + ')')
+            foo.start()
+            while foo.is_alive():
+                try:
+                    elem = log.get_q().get(timeout=1)
+                    yield connector_pb2.ExecutionResult(msg=elem)
+                except queue.Empty:
+                    pass
+            res = foo.join()
+            sys.stdout = old_stdout
+
         else:
             if params['is_default_function'] == "true":
                 prefix = ''
@@ -42,14 +77,26 @@ class ExecutionService(connector_pb2_grpc.ExecutorServicer):
                 arg_suffix = ''
             else:
                 arg_suffix = ','
-            res = eval(prefix + request.function + '(' + arg_string + arg_suffix + 'params)')
+
+            old_stdout = sys.stdout
+            sys.stdout = log
+            foo = ThreadWithReturnValue('myc.' + request.function + '(' + arg_string + ')')
+            foo.start()
+            while foo.is_alive():
+                try:
+                    elem = log.get_q().get(timeout=1)
+                    yield connector_pb2.ExecutionResult(msg=elem)
+                except queue.Empty:
+                    pass
+            res = foo.join()
+            sys.stdout = old_stdout
 
         global next_id
         next_name = 'i' + str(next_id)
         next_id = next_id + 1
 
         global_vars[next_name] = res
-        return connector_pb2.ExecutionResult(ref=next_name)
+        yield connector_pb2.ExecutionResult(ref=next_name)
 
     def UpdateLib(self, request, context):
         globals()['myc'] = __import__('all')
@@ -59,6 +106,26 @@ class ExecutionService(connector_pb2_grpc.ExecutorServicer):
         global global_vars
         res = global_vars[request.ref]
         return connector_pb2.OutResult(json=str(res))
+
+
+class Logger(object):
+    def __init__(self, q):
+        self.terminal = sys.stdout
+        self.q = q
+
+    def get_q(self):
+        return self.q
+
+    def write(self, message):
+        if message.strip() != '':
+            self.terminal.write(message)
+            self.q.put(message)
+
+    def flush(self):
+        pass
+
+    def throw(self, type=None, value=None, traceback=None):
+        raise StopIteration
 
 
 def serve():

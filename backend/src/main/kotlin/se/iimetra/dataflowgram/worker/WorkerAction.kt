@@ -30,6 +30,7 @@ sealed class WorkerAction {
     val function: FunctionId,
     val arguments: List<String> = emptyList(),
     val params: Map<String, String> = emptyMap(),
+    val onMessageReceive: (String) -> Unit = {},
     override val result: CompletableFuture<String>
   ): CompletableAction<String>, WorkerAction()
 }

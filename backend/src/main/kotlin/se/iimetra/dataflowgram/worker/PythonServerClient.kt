@@ -1,10 +1,12 @@
 package se.iimetra.dataflowgram.worker
 
+import com.google.protobuf.Descriptors
 import io.grpc.ManagedChannel
 import io.grpc.ManagedChannelBuilder
 import io.grpc.StatusRuntimeException
 import se.iimetra.dataflow.FunctionId
 import se.iimetra.dataflowgram.lib.fullName
+import java.lang.IllegalStateException
 import java.util.concurrent.TimeUnit
 import java.util.logging.Level
 import java.util.logging.Logger
@@ -37,10 +39,19 @@ class PythonServerClient internal constructor(private val channel: ManagedChanne
 
     val request = requestBuilder.build()
     val response = blockingStub.execute(request)
-    return response.ref
+
+    response.forEach {
+      if (it.valueCase == Connector.ExecutionResult.ValueCase.MSG) {
+        //onMessageReceive(it.msg)
+      } else {
+        return it.ref
+      }
+    }
+
+    throw IllegalStateException("Should not be here")
   }
 
-  fun executeCommand(functionMeta: FunctionId, args: List<String>, params: Map<String, String>): String {
+  fun executeCommand(functionMeta: FunctionId, args: List<String>, params: Map<String, String>, onMessageReceive: (String) -> Unit): String {
     val requestBuilder = Connector.ExecutionRequest.newBuilder()
       .setFunction(fullName(functionMeta.category, functionMeta.file, functionMeta.name))
       .addAllArgs(args)
@@ -55,7 +66,15 @@ class PythonServerClient internal constructor(private val channel: ManagedChanne
       throw Exception()
     }
 
-    return response.ref
+    response.forEach {
+      if (it.valueCase == Connector.ExecutionResult.ValueCase.MSG) {
+        onMessageReceive(it.msg)
+      } else {
+        return it.ref
+      }
+    }
+
+    throw IllegalStateException("Should not be here")
   }
 
   fun update(): Boolean {

@@ -18,6 +18,7 @@ html, body {
 }
 
 .home-left {
+  max-height: 102rem;
   display: inline-block;
   min-width: 100%;
   background-color: white;
@@ -37,6 +38,7 @@ html, body {
 
 .home-right {
   min-width: 100%;
+  max-height: 102rem;
   background-color: white;
   border-radius: 10px;
   padding: 2rem 2rem;

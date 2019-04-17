@@ -43,12 +43,12 @@ class ESComponent : RComponent<ESComponent.Props, RState>() {
           overlay = buildElement {
             Popover {
               attrs {
-                id = "popover-select-pretrained"
-                title = "Code"
+                id = "popover-select-output"
+                title = "Output"
               }
               div("log-box") {
                 pre {
-                  +function.view.content.filter { !it.isBlank() }.joinToString("\n")
+                  +(props.state.logs ?: emptyList()).joinToString("\n")
                 }
               }
             }

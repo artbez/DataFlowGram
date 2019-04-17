@@ -14,7 +14,9 @@ class ServerEventController {
       val (func, filter) = iter.next()
       if (filter.invoke(response)) {
         func.invoke(response)
-        iter.remove()
+        if (response.ref != null) {
+          iter.remove()
+        }
       }
     }
   }
