@@ -11,7 +11,7 @@ import se.iimetra.dataflowgram.home.serverEventController
 import se.iimetra.dataflowgram.wrappers.react.diagrams.models.NodeModel
 import se.iimetra.dataflowgram.wrappers.react.diagrams.models.PortModel
 
-class DefaultNodeExecutor(node: NodeModel, var panel: DiagramExecutionPanel) : AbstractNodeExecutor(node) {
+class ServerNodeExecutor(node: NodeModel, var panel: DiagramExecutionPanel) : AbstractNodeExecutor(node) {
 
   private val valueHolders = node.inPorts().sortedBy { it.index }.map { it.getID() to ValueHolderPort<String?>(this) }.toMap()
   private var outData: ValueHolderPort<String?>? = null

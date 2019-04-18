@@ -1,6 +1,18 @@
 .diagram-net {
 
-  &__node {
+  &__node_js {
+    // position: absolute;
+    display: inline-block;
+    background-color: aliceblue;
+    border: 4px solid #2fdbab;
+
+    &__span {
+      font-size: 18px;
+      padding: 3px;
+    }
+  }
+
+  &__node_python {
     // position: absolute;
     display: inline-block;
     background-color: aliceblue;
@@ -55,4 +67,14 @@
       bottom: 4rem;
     }
   }
+}
+
+.converter-icon_up {
+  width: 2rem;
+  fill: #2fdbab;
+}
+
+.converter-icon_down {
+  width: 2rem;
+  fill: palevioletred;
 }

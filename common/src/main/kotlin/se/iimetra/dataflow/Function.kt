@@ -22,10 +22,16 @@ data class FunctionDescription(
   val view: FunctionTextView
 )
 
+@Serializable
+data class SystemFunction(val functionSignature: FunctionSignature, val name: String, val id: String, val params: Map<String, String> = emptyMap())
+
 fun FunctionDescription.fullId() = "${meta.language}__${view.id.category}__${view.id.file}__${view.id.name}"
 
 @Serializable
 data class GitContent(val version: Long, val serverSpace: SpaceContent, val clientSpace: SpaceContent)
+
+@Serializable
+data class AllFunctions(val git: GitContent, val connectors: List<SystemFunction>)
 
 @Serializable
 data class SpaceContent(val functions: List<FunctionDescription>)

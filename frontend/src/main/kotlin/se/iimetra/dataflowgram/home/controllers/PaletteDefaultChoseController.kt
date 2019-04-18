@@ -5,7 +5,7 @@ import se.iimetra.dataflow.GitContent
 import se.iimetra.dataflow.fullId
 import se.iimetra.dataflowgram.home.configController
 
-class PaletteChoseController {
+class PaletteDefaultChoseController {
   var choosen: FunctionDescription? = null
   private val listeners = mutableListOf<(FunctionDescription) -> Unit>()
 
@@ -15,10 +15,9 @@ class PaletteChoseController {
   }
 
   fun newChoose(newId: String) {
-    choosen = configController.gitContent.serverSpace.functions.firstOrNull {
+    choosen = configController.gitContent.git.serverSpace.functions.firstOrNull {
       it.fullId() == newId
-    }
-    choosen = configController.gitContent.clientSpace.functions.firstOrNull {
+    } ?: configController.gitContent.git.clientSpace.functions.firstOrNull {
       it.fullId() == newId
     }
     choosen?.let { ch -> listeners.forEach { it.invoke(ch) } }

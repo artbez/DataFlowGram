@@ -39,7 +39,7 @@ class EventController {
       when (answer.eventType) {
 
         "config" -> {
-          val ans = Json.plain.parse<GitContent>(answer.content)
+          val ans = Json.plain.parse<AllFunctions>(answer.content)
           configController.push(ans)
         }
 

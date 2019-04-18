@@ -2,6 +2,7 @@ package se.iimetra.dataflowgram.home.diagram.node.ports
 
 import react.*
 import react.dom.div
+import se.iimetra.dataflowgram.home.diagram.node.InitDefaultNode
 import se.iimetra.dataflowgram.utils.toMap
 import se.iimetra.dataflowgram.wrappers.react.diagrams.LinkModelListener
 import se.iimetra.dataflowgram.wrappers.react.diagrams.PortWidget
@@ -35,9 +36,14 @@ class InitialPortModel(val sname: String, val type: PortType, val index: Int) : 
   override fun createLinkModel(): LinkModel<out LinkModelListener>? = DefaultLinkModel()
 
   override fun canLinkToPort(port: InitialPortModel): Boolean {
-    console.log(getLinks().toMap())
-    console.log(port.getLinks().toMap())
-    return type != port.type && sname == port.sname && getNode() != port.getNode()
+    val curNode = getNode()
+    val otherNode = port.getNode()
+    if (curNode is InitDefaultNode && otherNode is InitDefaultNode) {
+      if (curNode.function.meta.language != otherNode.function.meta.language) {
+        return false
+      }
+    }
+    return type != port.type && sname == port.sname && curNode != otherNode
        // && getLinks().toMap().size == 1 && port.getLinks().toMap().size == 1
   }
 }

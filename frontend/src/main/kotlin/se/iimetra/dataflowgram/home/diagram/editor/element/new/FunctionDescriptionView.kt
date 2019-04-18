@@ -6,7 +6,6 @@ import se.iimetra.dataflow.FunctionDescription
 import se.iimetra.dataflow.toMathText
 import se.iimetra.dataflowgram.dom.logIcon
 import se.iimetra.dataflowgram.home.diagram.SceneTransferObject
-import se.iimetra.dataflowgram.home.diagram.editor.new.editorNode
 import se.iimetra.dataflowgram.home.diagram.node.DefaultNodeFactory
 import se.iimetra.dataflowgram.home.diagram.node.defaultNodeWidget
 import se.iimetra.dataflowgram.wrappers.react.bootstrap.OverlayTrigger

@@ -10,7 +10,7 @@ import react.dom.div
 import react.dom.h4
 import react.dom.hr
 import se.iimetra.dataflowgram.home.diagram.palette.ViewCell
-import se.iimetra.dataflowgram.home.paletteChoseController
+import se.iimetra.dataflowgram.home.paletteDefaultChoseController
 import se.iimetra.dataflowgram.wrappers.react.devextreme.TreeView
 
 class CategoryBlock : RComponent<CategoryBlock.Props, RState>() {
@@ -37,7 +37,7 @@ class CategoryBlock : RComponent<CategoryBlock.Props, RState>() {
           searchEnabled = true
           onItemClick = {
             if (it.itemData.items == null) {
-              paletteChoseController.newChoose(it.itemData.id as String)
+              paletteDefaultChoseController.newChoose(it.itemData.id as String)
             }
           }
         }

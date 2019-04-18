@@ -39,4 +39,5 @@ class PATH(initialAttributes: Map<String, String>, consumer: TagConsumer<*>) :
         emptyTag = false
     ), HtmlInlineTag
 
-fun RDOMBuilder<SVG>.path(path: String): ReactElement = tag({}) { PATH(attributesMapOf("d", path), it) }
+fun RDOMBuilder<SVG>.path(path: dynamic): ReactElement = tag({}) { PATH(attributesMapOf("d", path), it) }
+fun RDOMBuilder<SVG>.path(style: dynamic, path: String): ReactElement = tag({}) { PATH(attributesMapOf("style", style, "d", path), it) }

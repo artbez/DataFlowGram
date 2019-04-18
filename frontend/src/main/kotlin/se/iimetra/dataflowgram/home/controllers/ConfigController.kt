@@ -3,6 +3,7 @@ package se.iimetra.dataflowgram.home.controllers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
+import se.iimetra.dataflow.AllFunctions
 import se.iimetra.dataflow.GitContent
 import se.iimetra.dataflow.SpaceContent
 import se.iimetra.dataflowgram.utils.get
@@ -13,15 +14,15 @@ interface ConfigUpdateListener {
 
 class ConfigController {
 
-  var gitContent = GitContent(-1, SpaceContent(emptyList()), SpaceContent(emptyList()))
-  private val listeners = mutableListOf<(GitContent) -> Unit>()
+  var gitContent = AllFunctions(GitContent(-1, SpaceContent(emptyList()), SpaceContent(emptyList())), emptyList())
+  private val listeners = mutableListOf<(AllFunctions) -> Unit>()
 
-  fun push(git: GitContent) {
-    gitContent = git
-    listeners.forEach { it.invoke(git) }
+  fun push(all: AllFunctions) {
+    gitContent = all
+    listeners.forEach { it.invoke(all) }
   }
 
-  fun addListener(listener: (GitContent) -> Unit) {
+  fun addListener(listener: (AllFunctions) -> Unit) {
     listeners.add(listener)
     listener(gitContent)
   }

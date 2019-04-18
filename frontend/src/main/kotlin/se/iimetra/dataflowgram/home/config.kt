@@ -1,11 +1,9 @@
 package se.iimetra.dataflowgram.home
 
 import kotlinx.serialization.ImplicitReflectionSerializer
-import se.iimetra.dataflowgram.home.controllers.ConfigController
-import se.iimetra.dataflowgram.home.controllers.EventController
-import se.iimetra.dataflowgram.home.controllers.PaletteChoseController
-import se.iimetra.dataflowgram.home.controllers.ServerEventController
+import se.iimetra.dataflowgram.home.controllers.*
 import se.iimetra.dataflowgram.home.diagram.executor.ExecutionService
+import se.iimetra.dataflowgram.home.diagram.node.ConverterNodeFactory
 import se.iimetra.dataflowgram.home.diagram.node.DefaultNodeFactory
 import se.iimetra.dataflowgram.home.diagram.node.ports.InitialPortModel
 import se.iimetra.dataflowgram.home.diagram.node.ports.PortType
@@ -20,15 +18,18 @@ fun DiagramEngine.setup(): DiagramEngine {
   installDefaultFactories()
 
   registerNodeFactory(DefaultNodeFactory.instance)
+  registerNodeFactory(ConverterNodeFactory.instance)
 
   val model = DiagramModel()
   setDiagramModel(model)
   return this
 }
 
+val paletteSystemChoseController = PaletteSystemChoseController()
+val clientEventController = ClientEventController()
 val serverEventController = ServerEventController()
 val configController = ConfigController()
-val paletteChoseController = PaletteChoseController()
+val paletteDefaultChoseController = PaletteDefaultChoseController()
 val executionService = ExecutionService()
 @ImplicitReflectionSerializer
 val eventController = EventController()

@@ -6,14 +6,19 @@ import react.dom.div
 import react.dom.h4
 import react.dom.hr
 import se.iimetra.dataflow.FunctionDescription
+import se.iimetra.dataflow.SystemFunction
 import se.iimetra.dataflowgram.home.diagram.SceneTransferObject
 import se.iimetra.dataflowgram.home.diagram.editor.element.existing.diaElemView
+import se.iimetra.dataflowgram.home.diagram.editor.element.existing.systemDiaElemView
 import se.iimetra.dataflowgram.home.diagram.editor.element.new.functionDescriptionView
+import se.iimetra.dataflowgram.home.diagram.editor.element.new.systemDescriptionView
 import se.iimetra.dataflowgram.home.diagram.editor.panel.DiagramExecutionPanel
 import se.iimetra.dataflowgram.home.diagram.editor.panel.diagramPanel
+import se.iimetra.dataflowgram.home.diagram.node.ConverterNode
 import se.iimetra.dataflowgram.home.diagram.node.InitDefaultNode
 import se.iimetra.dataflowgram.home.executionService
-import se.iimetra.dataflowgram.home.paletteChoseController
+import se.iimetra.dataflowgram.home.paletteDefaultChoseController
+import se.iimetra.dataflowgram.home.paletteSystemChoseController
 import se.iimetra.dataflowgram.utils.toMap
 import se.iimetra.dataflowgram.wrappers.react.diagrams.DiagramEngine
 import se.iimetra.dataflowgram.wrappers.react.diagrams.models.NodeModel
@@ -32,9 +37,10 @@ class Editor : RComponent<Editor.Props, Editor.State>() {
     if (selectedNodes.isNotEmpty()) {
       val elem = selectedNodes[0]
       setState {
-        paletteChosen = null
+        defaultPaletteChosen = null
         selectedNode = elem
         executionPanel = execMap[elem.getID()]
+        systemPaletteChosen = null
       }
     } else {
       setState {
@@ -45,22 +51,33 @@ class Editor : RComponent<Editor.Props, Editor.State>() {
   }
 
   override fun Editor.State.init() {
-    paletteChosen = null
+    defaultPaletteChosen = null
     selectedNode = null
+    systemPaletteChosen = null
   }
 
   override fun componentDidMount() {
-    paletteChoseController.addListener {
+    paletteDefaultChoseController.addListener {
       setState {
         executionPanel = null
         selectedNode = null
-        paletteChosen = it
+        systemPaletteChosen = null
+        defaultPaletteChosen = it
+      }
+    }
+    paletteSystemChoseController.addListener {
+      setState {
+        executionPanel = null
+        selectedNode = null
+        systemPaletteChosen = it
+        defaultPaletteChosen = null
       }
     }
   }
 
   interface State : RState {
-    var paletteChosen: FunctionDescription?
+    var defaultPaletteChosen: FunctionDescription?
+    var systemPaletteChosen: SystemFunction?
     var selectedNode: NodeModel?
     var executionPanel: DiagramExecutionPanel?
   }
@@ -71,10 +88,17 @@ class Editor : RComponent<Editor.Props, Editor.State>() {
         if (state.executionPanel != null) +"ExecutionPanel" else +"Configurer"
       }
       hr("home-left__line") { }
-      if (state.paletteChosen != null) {
+      if (state.defaultPaletteChosen != null) {
         functionDescriptionView {
           attrs {
-            function = state.paletteChosen!!
+            function = state.defaultPaletteChosen!!
+            sceneTransferObject = props.sceneTransfer
+          }
+        }
+      } else if (state.systemPaletteChosen != null) {
+        systemDescriptionView {
+          attrs {
+            function = state.systemPaletteChosen!!
             sceneTransferObject = props.sceneTransfer
           }
         }
@@ -85,15 +109,22 @@ class Editor : RComponent<Editor.Props, Editor.State>() {
             diagramExecutionPanel = state.executionPanel!!
           }
         }
-      }
-      else if (state.selectedNode != null) {
-        diaElemView {
-          attrs {
-            function = (state.selectedNode as InitDefaultNode).function
-            selectedNode = state.selectedNode!!
-            updateDiagram = props.updateDiagram
-            engine = props.engine
+      } else if (state.selectedNode != null) {
+        when (state.selectedNode) {
+          is InitDefaultNode -> diaElemView {
+            attrs {
+              function = (state.selectedNode as InitDefaultNode).function
+              selectedNode = state.selectedNode!!
+              updateDiagram = props.updateDiagram
+              engine = props.engine
+            }
           }
+          is ConverterNode -> systemDiaElemView {
+            attrs {
+              function = (state.selectedNode as ConverterNode).function
+            }
+          }
+          else -> throw IllegalStateException("Impossible")
         }
       }
     }
