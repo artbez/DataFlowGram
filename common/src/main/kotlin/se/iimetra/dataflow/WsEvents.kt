@@ -10,6 +10,22 @@ data class WsRequest(val eventType: String, val content: String)
 data class WsResponse(val eventType: String, val content: String)
 
 @Serializable
+data class ConverterEventRequest(
+  val systemFunctionId: String,
+  val executionPanelId: Long,
+  val blockIndex: Int,
+  val arg: String
+)
+
+@Serializable
+data class ConverterEventResponse(
+  val systemFunctionId: String,
+  val executionPanelId: Long,
+  val blockIndex: Int,
+  val result: String
+)
+
+@Serializable
 data class ServerEventRequest(
   val functionId: FunctionId,
   val arguments: List<String>,

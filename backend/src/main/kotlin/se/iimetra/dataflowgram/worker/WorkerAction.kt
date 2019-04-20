@@ -1,6 +1,7 @@
 package se.iimetra.dataflowgram.worker
 
 import se.iimetra.dataflow.FunctionId
+import se.iimetra.dataflowgram.root.ValueTypePair
 import java.nio.file.Path
 import java.util.concurrent.CompletableFuture
 
@@ -21,10 +22,16 @@ sealed class WorkerAction {
     override val result: CompletableFuture<String>
   ): CompletableAction<String>, WorkerAction()
 
-  data class GetJson(
+  data class OutData(
     val ref: String,
-    override val result: CompletableFuture<String>
-  ): CompletableAction<String>, WorkerAction()
+    val type: String,
+    override val result: CompletableFuture<ValueTypePair>
+  ): CompletableAction<ValueTypePair>, WorkerAction()
+
+  data class InData(
+    val data: ValueTypePair,
+    override val result: CompletableFuture<ValueTypePair>
+  ): CompletableAction<ValueTypePair>, WorkerAction()
 
   data class Execute(
     val function: FunctionId,

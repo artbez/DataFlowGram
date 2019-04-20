@@ -32,8 +32,12 @@ class RootDispatcher : GitListener {
     return worker.uploadFile(path)
   }
 
-  suspend fun loadJson(ref: String): CompletableFuture<String> {
-    return worker.getJson(ref)
+  suspend fun outData(ref: String, type: String): CompletableFuture<ValueTypePair> {
+    return worker.outData(ref, type)
+  }
+
+  suspend fun inData(value: String, type: String): CompletableFuture<ValueTypePair> {
+    return worker.inData(value, type)
   }
 
   suspend fun execute(
@@ -49,3 +53,5 @@ class RootDispatcher : GitListener {
     return worker.execute(function, args, params, onMessageReceive)
   }
 }
+
+data class ValueTypePair(val value: String, val type: String)

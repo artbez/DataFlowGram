@@ -21,14 +21,25 @@ message ExecutionResult {
 
 message OutRequest {
     string ref = 1;
+    string type = 2;
 }
 
 message OutResult {
-    string json = 1;
+    string value = 1;
+}
+
+message InRequest {
+    string value = 1;
+    string type = 2;
+}
+
+message InResult {
+    string ref = 1;
 }
 
 service Executor {
     rpc Execute (ExecutionRequest) returns (stream ExecutionResult) {}
-    rpc Out (OutRequest) returns (OutResult) {}
+    rpc OutData (OutRequest) returns (OutResult) {}
+    rpc InData (InRequest) returns (InResult) {}
     rpc UpdateLib (Update) returns (Updated) {}
 }

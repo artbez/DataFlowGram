@@ -5,6 +5,7 @@ import time
 import logging
 import os
 from typing import Generator
+import json
 
 import grpc
 import sys
@@ -102,10 +103,34 @@ class ExecutionService(connector_pb2_grpc.ExecutorServicer):
         globals()['myc'] = __import__('all')
         return connector_pb2.Updated()
 
-    def Out(self, request, context):
+    def OutData(self, request, context):
         global global_vars
         res = global_vars[request.ref]
-        return connector_pb2.OutResult(json=str(res))
+        typedRes = str(res)
+        if type == "Json":
+            typedRes = json.dumps(res)
+
+        return connector_pb2.OutResult(value=typedRes)
+
+    def InData(self, request, context):
+        global global_vars
+        type = request.type
+        if type == "Int":
+            res = int(request.value)
+        if type == "Float":
+            res = float(request.value)
+        if type == "String":
+            res = str(request.value)
+        if type == "Json":
+            res = json.load(request.value)
+
+        global next_id
+        next_name = 'i' + str(next_id)
+        next_id = next_id + 1
+
+        global_vars[next_name] = res
+
+        return connector_pb2.InResult(ref=next_name)
 
 
 class Logger(object):
@@ -118,7 +143,7 @@ class Logger(object):
 
     def write(self, message):
         if message.strip() != '':
-            self.terminal.write(message)
+            self.terminal.write(message + "\n")
             self.q.put(message)
 
     def flush(self):

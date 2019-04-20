@@ -8,6 +8,7 @@ import org.springframework.context.support.GenericApplicationContext
 import org.springframework.context.support.beans
 import org.springframework.stereotype.Component
 import se.iimetra.dataflowgram.controller.ws.ConfigWsHandler
+import se.iimetra.dataflowgram.controller.ws.ConverterWsHandler
 import se.iimetra.dataflowgram.controller.ws.MainWSHandler
 import se.iimetra.dataflowgram.controller.ws.ServerEventWsHandler
 import se.iimetra.dataflowgram.git.GitConnector
@@ -22,6 +23,7 @@ class BeansInitializer : ApplicationContextInitializer<GenericApplicationContext
     bean<RootDispatcher>()
     bean<ConfigWsHandler>()
     bean<ServerEventWsHandler>()
+    bean<ConverterWsHandler>()
     bean<MainWSHandler>()
   }.initialize(applicationContext)
 }

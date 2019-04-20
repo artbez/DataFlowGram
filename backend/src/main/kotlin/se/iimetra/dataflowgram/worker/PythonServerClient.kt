@@ -6,6 +6,7 @@ import io.grpc.ManagedChannelBuilder
 import io.grpc.StatusRuntimeException
 import se.iimetra.dataflow.FunctionId
 import se.iimetra.dataflowgram.lib.fullName
+import se.iimetra.dataflowgram.root.ValueTypePair
 import java.lang.IllegalStateException
 import java.util.concurrent.TimeUnit
 import java.util.logging.Level
@@ -26,10 +27,16 @@ class PythonServerClient internal constructor(private val channel: ManagedChanne
     channel.shutdown().awaitTermination(5, TimeUnit.SECONDS)
   }
 
-  fun getJson(ref: String): String {
-    val request = Connector.OutRequest.newBuilder().setRef(ref).build()
-    val response = blockingStub.out(request)
-    return response.json
+  fun outCommand(ref: String, type: String): String {
+    val request = Connector.OutRequest.newBuilder().setRef(ref).setType(type).build()
+    val response = blockingStub.outData(request)
+    return response.value
+  }
+
+  fun inCommand(data: ValueTypePair): String {
+    val request = Connector.InRequest.newBuilder().setType(data.type).setValue(data.value).build()
+    val response = blockingStub.inData(request)
+    return response.ref
   }
 
   fun executeDefaultCommand(function: String, params: Map<String, String>): String {

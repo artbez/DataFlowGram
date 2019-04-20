@@ -11,7 +11,7 @@ abstract class AbstractNodeExecutor(val node: NodeModel) {
   private var dataPoints = node.inPorts().size
   protected abstract suspend fun execute()
 
-  abstract fun getPortById(portId: String): ValueHolderPort<String?>
+  abstract fun getPortById(portId: String): ValueHolderPort<dynamic>
 
   abstract fun attachPort(port: PortModel, targetExecutor: AbstractNodeExecutor)
 

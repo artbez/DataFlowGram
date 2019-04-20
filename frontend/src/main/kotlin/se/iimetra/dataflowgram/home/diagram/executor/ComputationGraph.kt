@@ -3,18 +3,19 @@ package se.iimetra.dataflowgram.home.diagram.executor
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import se.iimetra.dataflowgram.home.diagram.editor.panel.DiagramExecutionPanel
+import se.iimetra.dataflowgram.home.diagram.node.ConverterNode
 import se.iimetra.dataflowgram.home.diagram.node.InitDefaultNode
 import se.iimetra.dataflowgram.home.inPort
 import se.iimetra.dataflowgram.home.outLinks
 import se.iimetra.dataflowgram.wrappers.react.diagrams.models.NodeModel
 
-class ComputationGraph(val nodes: List<NodeModel>, panel: DiagramExecutionPanel) {
+class ComputationGraph(nodes: List<NodeModel>, panel: DiagramExecutionPanel) {
 
   val executors: List<AbstractNodeExecutor>
 
   init {
     val executorMap = nodes
-      .map { it.getID() to if ((it as InitDefaultNode).function.meta.language == "js") ClientNodeExecutor(it, panel) else ServerNodeExecutor(it, panel) }
+      .map { it.getID() to createExecutor(it, panel) }
       .toMap()
 
     nodes.forEach { sourceNode ->
@@ -36,6 +37,15 @@ class ComputationGraph(val nodes: List<NodeModel>, panel: DiagramExecutionPanel)
       }.forEach { it.join() }
     } finally {
       callback()
+    }
+  }
+
+  private fun createExecutor(node: NodeModel, panel: DiagramExecutionPanel): AbstractNodeExecutor {
+    return when (node) {
+      is InitDefaultNode -> if (node.function.meta.language == "js") ClientNodeExecutor(node, panel)
+                            else ServerNodeExecutor(node, panel)
+      is ConverterNode -> ConverterExecutor(node, panel)
+      else -> throw IllegalStateException("Wrong executor")
     }
   }
 }

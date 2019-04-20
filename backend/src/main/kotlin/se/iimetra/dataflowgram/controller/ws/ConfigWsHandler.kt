@@ -20,16 +20,16 @@ class ConfigWsHandler : GitListener {
   @ImplicitReflectionSerializer
   override suspend fun parseUpdate(newContent: GitContent) {
     currentConfig = newContent
-    val wsResponse = WsResponse("config", Json.plain.stringify(AllFunctions(currentConfig, connectors)))
+    val wsResponse = WsResponse("config", Json.plain.stringify(AllFunctions(currentConfig, connectors.values.toList())))
     sessions.forEach { session -> session.send(Mono.just(session.textMessage(Json.stringify(wsResponse)))).block() }
   }
 
   @UseExperimental(ImplicitReflectionSerializer::class)
   fun processConfigRequest(session: WebSocketSession) = GlobalScope.future {
     sessions.add(session)
-    val response = WsResponse("config", Json.plain.stringify(AllFunctions(currentConfig, connectors)))
+    val response = WsResponse("config", Json.plain.stringify(AllFunctions(currentConfig, connectors.values.toList())))
     session.send(Mono.just(session.textMessage(Json.stringify(response)))).block()
-    WsResponse("config", Json.plain.stringify(AllFunctions(currentConfig, connectors)))
+    WsResponse("config", Json.plain.stringify(AllFunctions(currentConfig, connectors.values.toList())))
   }
 }
 
@@ -42,4 +42,4 @@ val connectors = listOf(
   SystemFunction(FunctionSignature(listOf("String"), "String"), "String down", "string_down_converter", mapOf("from" to "client")),
   SystemFunction(FunctionSignature(listOf("Float"), "Float"), "Float up", "float_up_converter", mapOf("from" to "server")),
   SystemFunction(FunctionSignature(listOf("Float"), "Float"), "Float down", "float_down_converter", mapOf("from" to "client"))
-)
+).map { it.id to it }.toMap()

@@ -7,6 +7,7 @@ import kotlinx.serialization.stringify
 import org.w3c.dom.WebSocket
 import se.iimetra.dataflow.*
 import se.iimetra.dataflowgram.home.configController
+import se.iimetra.dataflowgram.home.converterController
 import se.iimetra.dataflowgram.home.diagram.editor.panel.DiagramExecutionPanel
 import se.iimetra.dataflowgram.home.serverEventController
 import kotlin.browser.window
@@ -48,6 +49,10 @@ class EventController {
           serverEventController.push(ans)
         }
 
+        "converter" -> {
+          val ans = Json.plain.parse<ConverterEventResponse>(answer.content)
+          converterController.push(ans)
+        }
         else -> TODO()
       }
     }
@@ -56,6 +61,12 @@ class EventController {
   fun pushServerEvent(function: FunctionDescription, args: List<String>, executionPanelId: Long, blockIndex: Int) {
     val serverEvent = ServerEventRequest(function.view.id, args, function.meta.version, executionPanelId, blockIndex)
     val request = WsRequest("server", Json.stringify(serverEvent))
+    clientWebSocket.send(Json.stringify(request))
+  }
+
+  fun pushConverterEvent(function: SystemFunction, arg: String, executionPanelId: Long, blockIndex: Int) {
+    val converterEvent = ConverterEventRequest(function.id, executionPanelId, blockIndex, arg)
+    val request = WsRequest("converter", Json.stringify(converterEvent))
     clientWebSocket.send(Json.stringify(request))
   }
 }

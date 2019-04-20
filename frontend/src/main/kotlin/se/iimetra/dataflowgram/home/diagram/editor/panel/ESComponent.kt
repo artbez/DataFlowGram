@@ -4,20 +4,22 @@ import react.*
 import react.dom.*
 import se.iimetra.dataflow.toMathText
 import se.iimetra.dataflowgram.dom.logIcon
-import se.iimetra.dataflowgram.home.diagram.node.DefaultNodeFactory
-import se.iimetra.dataflowgram.home.diagram.node.InitDefaultNode
-import se.iimetra.dataflowgram.home.diagram.node.defaultNodeWidget
+import se.iimetra.dataflowgram.home.diagram.node.*
 import se.iimetra.dataflowgram.wrappers.react.bootstrap.OverlayTrigger
 import se.iimetra.dataflowgram.wrappers.react.bootstrap.Popover
 import se.iimetra.dataflowgram.wrappers.react.diagrams.models.NodeModel
 
 class ESComponent : RComponent<ESComponent.Props, RState>() {
   override fun RBuilder.render() {
-    val function = (props.state.node as InitDefaultNode).function
+    val signature = when (props.state.node) {
+      is InitDefaultNode -> (props.state.node as InitDefaultNode).function.meta.signature
+      is ConverterNode -> (props.state.node as ConverterNode).function.functionSignature
+      else -> throw IllegalStateException("Unsupported node type")
+    }
     div("configurer-props") {
       div("configurer-props__group") {
         b { +"Signature:" }
-        span { +function.meta.signature.toMathText() }
+        span { +signature.toMathText() }
       }
       div("configurer-props__group") {
         b { +"Node:" }
@@ -66,10 +68,21 @@ class ESComponent : RComponent<ESComponent.Props, RState>() {
   }
 
   private fun RBuilder.createWidget(nodeModel: NodeModel) {
-    defaultNodeWidget {
-      attrs {
-        this.defaultNode = DefaultNodeFactory.instance.getNewInstance((props.state.node as InitDefaultNode).function)
-        isView = true
+    when (nodeModel) {
+      is InitDefaultNode ->
+        defaultNodeWidget {
+          attrs {
+            this.defaultNode = DefaultNodeFactory.instance.getNewInstance(nodeModel.function)
+            isView = true
+          }
+        }
+      is ConverterNode -> {
+        converterNodeWidget {
+          attrs {
+            this.converterNode = ConverterNodeFactory.instance.getNewInstance(nodeModel.function)
+            isView = true
+          }
+        }
       }
     }
   }

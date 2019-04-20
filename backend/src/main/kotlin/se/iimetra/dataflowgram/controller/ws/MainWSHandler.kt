@@ -12,7 +12,8 @@ import se.iimetra.dataflow.WsRequest
 
 class MainWSHandler(
   private val configWsHandler: ConfigWsHandler,
-  private val serverEventWsHandler: ServerEventWsHandler
+  private val serverEventWsHandler: ServerEventWsHandler,
+  private val converterWsHandler: ConverterWsHandler
 ) : WebSocketHandler {
 
   private val logger = LoggerFactory.getLogger(MainWSHandler::class.java)
@@ -31,6 +32,7 @@ class MainWSHandler(
         when (request.eventType) {
           "config" -> configWsHandler.processConfigRequest(session)
           "server" -> serverEventWsHandler.processServerRequest(session, request.content)
+          "converter" -> converterWsHandler.processConverterRequest(session, request.content)
           else -> throw Exception()
         }.thenAccept {
           logger.info(session.id)

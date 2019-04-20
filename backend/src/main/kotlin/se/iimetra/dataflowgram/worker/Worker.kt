@@ -6,6 +6,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
 import se.iimetra.dataflow.FunctionId
+import se.iimetra.dataflowgram.root.ValueTypePair
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -50,9 +51,13 @@ class Worker {
           val fileRef = client.initFile(newPath)
           action.result.complete(fileRef)
         }
-        is WorkerAction.GetJson -> {
-          val json = client.getJson(action.ref)
-          action.result.complete(json)
+        is WorkerAction.OutData -> {
+          val value = client.outCommand(action.ref, action.type)
+          action.result.complete(ValueTypePair(value, action.type))
+        }
+        is WorkerAction.InData -> {
+          val value = client.inCommand(action.data)
+          action.result.complete(ValueTypePair(value, action.data.type))
         }
         is WorkerAction.InitFile -> {
           val fileRef = client.initFile(Paths.get("lib/${action.name}"))
@@ -84,9 +89,15 @@ class Worker {
     return future
   }
 
-  suspend fun getJson(ref: String): CompletableFuture<String> {
-    val future = CompletableFuture<String>()
-    actionQueue.send(WorkerAction.GetJson(ref, future))
+  suspend fun outData(ref: String, type: String): CompletableFuture<ValueTypePair> {
+    val future = CompletableFuture<ValueTypePair>()
+    actionQueue.send(WorkerAction.OutData(ref, type, future))
+    return future
+  }
+
+  suspend fun inData(value: String, type: String): CompletableFuture<ValueTypePair> {
+    val future = CompletableFuture<ValueTypePair>()
+    actionQueue.send(WorkerAction.InData(ValueTypePair(value, type), future))
     return future
   }
 

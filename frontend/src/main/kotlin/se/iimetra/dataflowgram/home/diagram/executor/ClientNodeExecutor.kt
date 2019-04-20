@@ -31,7 +31,7 @@ class ClientNodeExecutor(node: NodeModel, var panel: DiagramExecutionPanel) : Ab
     }
   }
 
-  override fun getPortById(portId: String): ValueHolderPort<String?> {
+  override fun getPortById(portId: String): ValueHolderPort<dynamic> {
     return valueHolders[portId]!!
   }
 

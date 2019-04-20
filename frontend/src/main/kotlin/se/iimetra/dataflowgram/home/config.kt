@@ -33,6 +33,7 @@ val paletteDefaultChoseController = PaletteDefaultChoseController()
 val executionService = ExecutionService()
 @ImplicitReflectionSerializer
 val eventController = EventController()
+val converterController = ConverterEventController()
 
 fun NodeModel.neighbors() = getPorts().toMap().values.map { it as InitialPortModel }
   .flatMap { it.getLinks().toMap().values.flatMap {
