@@ -25,7 +25,7 @@ class UpdateHandler(private val gitConnector: GitConnector, private val client: 
       return
     }
 
-    val updated = cache.get(gitContent.serverSpace.functions)
+    val updated = cache.get(gitContent.version, gitContent.serverSpace.functions)
     val files = toLocations(updated)
     val repo = gitConnector.localRepoDirectory.toAbsolutePath().toString()
 

@@ -41,7 +41,7 @@ class DiagramExecutionPanel(
   }
 }
 
-class ExecutionState(
+data class ExecutionState(
   val node: NodeModel,
   var completed: Boolean = false,
   var logs: List<String>? = null,

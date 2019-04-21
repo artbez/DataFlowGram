@@ -9,9 +9,12 @@ data class CacheValue(val version: Long, val description: FunctionDescription)
 class FunctionsCache {
   private val innerVersionCache = HashMap<FunctionId, CacheValue>()
 
-  fun get(functions: List<FunctionDescription>) = functions.mapNotNull { description ->
+  fun get(version: Long, functions: List<FunctionDescription>) = functions.mapNotNull { description ->
     val previous = innerVersionCache[description.view.id]
-    if (previous != null && previous.description == description) {
+    if (previous != null
+      && previous.description.view == description.view
+      && previous.description.meta.copy(version = version) == description.meta
+    ) {
       return@mapNotNull null
     }
     return@mapNotNull description
@@ -26,6 +29,6 @@ class FunctionsCache {
   @Synchronized
   fun check(function: FunctionId, version: Long): Boolean {
     val currentVersion = innerVersionCache[function]?.version ?: return false
-    return currentVersion == version
+    return currentVersion <= version
   }
 }

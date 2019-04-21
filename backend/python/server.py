@@ -7,7 +7,7 @@ import threading
 import time
 from concurrent import futures
 import traceback
-
+from importlib import reload
 
 import grpc
 
@@ -40,6 +40,7 @@ class ThreadWithReturnValue(threading.Thread):
             self._return = eval(self.arg)
         except:
             tb = traceback.format_exc()
+            print(tb)
             self._error = tb
 
     def join(self, *args):
@@ -65,7 +66,7 @@ class ExecutionService(connector_pb2_grpc.ExecutorServicer):
             sys.stdout = log
             foo = ThreadWithReturnValue(self.__getLocation(request.category, request.file) + '.' + request.function + '(' + arg_string + ')')
             foo.start()
-            while foo.is_alive():
+            while foo.is_alive() or not log.get_q().empty():
                 try:
                     elem = log.get_q().get(timeout=1)
                     yield connector_pb2.ExecutionResult(msg=elem)
@@ -77,6 +78,10 @@ class ExecutionService(connector_pb2_grpc.ExecutorServicer):
                 raise error
             finally:
                 sys.stdout = old_stdout
+
+            while not log.get_q().empty():
+                elem = log.get_q().get()
+                yield connector_pb2.ExecutionResult(msg=elem)
 
         else:
             if params['is_default_function'] == "true":
@@ -107,6 +112,10 @@ class ExecutionService(connector_pb2_grpc.ExecutorServicer):
             finally:
                 sys.stdout = old_stdout
 
+            while not log.get_q().empty():
+                elem = log.get_q().get()
+                yield connector_pb2.ExecutionResult(msg=elem)
+
         global next_id
         next_name = 'i' + str(next_id)
         next_id = next_id + 1
@@ -120,7 +129,10 @@ class ExecutionService(connector_pb2_grpc.ExecutorServicer):
             new_path = request.repo + '/python/' + location.category
             if new_path not in sys.path:
                 sys.path.append(request.repo + '/python/' + location.category)
-            globals()[self.__getLocation(location.category, location.file)] = __import__(location.file)
+            module = __import__(location.file)
+            reload(module)
+            globals()[self.__getLocation(location.category, location.file)] = module
+
         return connector_pb2.Updated()
 
     def OutData(self, request, context):
