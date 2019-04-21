@@ -8,13 +8,13 @@ data class FunctionSignature(val input: List<String>, val output: String)
 fun FunctionSignature.toMathText() = "(${input.joinToString(",") { it.trim() }}) -> $output"
 
 @Serializable
-data class FunctionMeta(val signature: FunctionSignature, val params: String?, val description: String?, val version: Long, val language: String)
+data class FunctionMeta(val label: String, val signature: FunctionSignature, val paramsMap: Map<String, String>, val description: String?, val version: Long, val language: String)
 
 @Serializable
 data class FunctionId(val category: String, val file: String, val name: String)
 
 @Serializable
-data class FunctionTextView(val id: FunctionId, val args: String, val content: List<String>, val imports: List<String>)
+data class FunctionTextView(val id: FunctionId, val args: String, val content: List<String>)
 
 @Serializable
 data class FunctionDescription(
@@ -44,11 +44,8 @@ data class FileContent(val name: String, val functions: List<CustomFunction>)
 
 @Serializable
 data class CustomFunction(
-  val signature: FunctionSignature,
-  val params: String?,
-  val description: String?,
+  val meta: FunctionMeta,
   val name: String,
   val args: String,
-  val lines: List<String>,
-  val imports: List<String>
+  val lines: List<String>
 )

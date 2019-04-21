@@ -13,7 +13,8 @@ import se.iimetra.dataflowgram.wrappers.react.diagrams.models.PortModel
 
 class ServerNodeExecutor(node: NodeModel, var panel: DiagramExecutionPanel) : AbstractNodeExecutor(node) {
 
-  private val valueHolders = node.inPorts().sortedBy { it.index }.map { it.getID() to ValueHolderPort<String?>(this) }.toMap()
+  private val valueHolders =
+    node.inPorts().sortedBy { it.index }.map { it.getID() to ValueHolderPort<String?>(this) }.toMap()
   private var outData: ValueHolderPort<String?>? = null
 
   @UseExperimental(ImplicitReflectionSerializer::class)
@@ -24,10 +25,14 @@ class ServerNodeExecutor(node: NodeModel, var panel: DiagramExecutionPanel) : Ab
       val panelId = panel.panelId
       val executionIndex = panel.executionList.size
       serverEventController.addListener({ it.executionPanelId == panelId && it.blockIndex == executionIndex }) { response ->
-        if (response.msg != null) {
-          panel.update(node, response.msg)
-        } else {
-          GlobalScope.launch {
+        when {
+          response.msg != null -> panel.update(node, response.msg)
+
+          response.error != null -> GlobalScope.launch {
+            panel.stopNode(node, response.error)
+          }
+
+          else -> GlobalScope.launch {
             panel.stopNode(node)
             outData?.setValue(response.ref)
           }

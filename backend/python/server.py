@@ -1,16 +1,15 @@
-import queue
-import threading
-from concurrent import futures
-import time
+import json
 import logging
 import os
-from typing import Generator
-import json
+import queue
+import sys
+import threading
+import time
+from concurrent import futures
+import traceback
+
 
 import grpc
-import sys
-
-import sys
 
 import connector_pb2
 import connector_pb2_grpc
@@ -34,12 +33,19 @@ class ThreadWithReturnValue(threading.Thread):
         threading.Thread.__init__(self)
         self.arg = arg
         self._return = None
+        self._error = None
 
     def run(self):
-        self._return = eval(self.arg)
+        try:
+            self._return = eval(self.arg)
+        except:
+            tb = traceback.format_exc()
+            self._error = tb
 
     def join(self, *args):
         threading.Thread.join(self, *args)
+        if self._error:
+            raise Exception(self._error)
         return self._return
 
 
@@ -57,7 +63,7 @@ class ExecutionService(connector_pb2_grpc.ExecutorServicer):
 
             old_stdout = sys.stdout
             sys.stdout = log
-            foo = ThreadWithReturnValue('myc.' + request.function + '(' + arg_string + ')')
+            foo = ThreadWithReturnValue(self.__getLocation(request.category, request.file) + '.' + request.function + '(' + arg_string + ')')
             foo.start()
             while foo.is_alive():
                 try:
@@ -65,14 +71,18 @@ class ExecutionService(connector_pb2_grpc.ExecutorServicer):
                     yield connector_pb2.ExecutionResult(msg=elem)
                 except queue.Empty:
                     pass
-            res = foo.join()
-            sys.stdout = old_stdout
+            try:
+                    res = foo.join()
+            except Exception as error:
+                raise error
+            finally:
+                sys.stdout = old_stdout
 
         else:
             if params['is_default_function'] == "true":
                 prefix = ''
             else:
-                prefix = 'myc.'
+                prefix = self.__getLocation(request.category, request.file) + '.'
 
             if arg_string is None or arg_string == '':
                 arg_suffix = ''
@@ -81,7 +91,7 @@ class ExecutionService(connector_pb2_grpc.ExecutorServicer):
 
             old_stdout = sys.stdout
             sys.stdout = log
-            foo = ThreadWithReturnValue('myc.' + request.function + '(' + arg_string + ')')
+            foo = ThreadWithReturnValue(prefix + request.function + '(' + arg_string + ')')
             foo.start()
             while foo.is_alive():
                 try:
@@ -89,8 +99,13 @@ class ExecutionService(connector_pb2_grpc.ExecutorServicer):
                     yield connector_pb2.ExecutionResult(msg=elem)
                 except queue.Empty:
                     pass
-            res = foo.join()
-            sys.stdout = old_stdout
+
+            try:
+                res = foo.join()
+            except Exception as error:
+                raise error
+            finally:
+                sys.stdout = old_stdout
 
         global next_id
         next_name = 'i' + str(next_id)
@@ -100,7 +115,12 @@ class ExecutionService(connector_pb2_grpc.ExecutorServicer):
         yield connector_pb2.ExecutionResult(ref=next_name)
 
     def UpdateLib(self, request, context):
-        globals()['myc'] = __import__('all')
+        sys.path.append(request.repo)
+        for location in request.locations:
+            new_path = request.repo + '/python/' + location.category
+            if new_path not in sys.path:
+                sys.path.append(request.repo + '/python/' + location.category)
+            globals()[self.__getLocation(location.category, location.file)] = __import__(location.file)
         return connector_pb2.Updated()
 
     def OutData(self, request, context):
@@ -131,6 +151,10 @@ class ExecutionService(connector_pb2_grpc.ExecutorServicer):
         global_vars[next_name] = res
 
         return connector_pb2.InResult(ref=next_name)
+
+    @staticmethod
+    def __getLocation(category, file):
+        return 'myc_' + category + '_' + file
 
 
 class Logger(object):

@@ -20,25 +20,25 @@ class BeansInitializer : ApplicationContextInitializer<GenericApplicationContext
       val repo = "/Users/artemii.bezguzikov/project/tt"
       GitConnector(repo)
     }
-    bean<RootDispatcher>()
     bean<ConfigWsHandler>()
+    bean<RootDispatcher>()
     bean<ServerEventWsHandler>()
     bean<ConverterWsHandler>()
     bean<MainWSHandler>()
   }.initialize(applicationContext)
 }
 
-@Component
-class AfterInitializationHook(
-  val gitConnector: GitConnector,
-  val dispatcher: RootDispatcher,
-  val configHandler: ConfigWsHandler
-) {
-
-  @EventListener
-  fun handleContextRefresh(event: ContextRefreshedEvent) {
-    gitConnector.addListener(dispatcher)
-    gitConnector.addListener(configHandler)
-    gitConnector.start()
-  }
-}
+//@Component
+//class AfterInitializationHook(
+//  val gitConnector: GitConnector,
+//  val dispatcher: RootDispatcher,
+//  val configHandler: ConfigWsHandler
+//) {
+//
+//  @EventListener
+//  fun handleContextRefresh(event: ContextRefreshedEvent) {
+//    gitConnector.addListener(dispatcher)
+//    gitConnector.addListener(configHandler)
+//    gitConnector.start()
+//  }
+//}

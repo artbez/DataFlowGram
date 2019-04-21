@@ -22,9 +22,14 @@ class DiagramExecutionPanel(
     onChange(executionList)
   }
 
-  fun <T : NodeModel> stopNode(node: T) {
+  fun <T : NodeModel> stopNode(node: T, errors: String? = null) {
     val state = executionList.find { it.node == node } ?: return
+
+    if (errors != null) {
+      state.errors = errors
+    }
     state.completed = true
+
     onChange(executionList)
   }
 
@@ -39,5 +44,6 @@ class DiagramExecutionPanel(
 class ExecutionState(
   val node: NodeModel,
   var completed: Boolean = false,
-  var logs: List<String>? = null
+  var logs: List<String>? = null,
+  var errors: String? = null
 )

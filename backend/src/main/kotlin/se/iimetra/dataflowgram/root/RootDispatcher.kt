@@ -1,27 +1,40 @@
 package se.iimetra.dataflowgram.root
 
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.future.await
+import kotlinx.coroutines.launch
+import org.slf4j.LoggerFactory
 import se.iimetra.dataflow.FunctionId
-import se.iimetra.dataflow.GitContent
-import se.iimetra.dataflowgram.git.GitListener
-import se.iimetra.dataflowgram.lib.LibHolder
+import se.iimetra.dataflowgram.controller.ws.ConfigWsHandler
+import se.iimetra.dataflowgram.git.GitConnector
 import se.iimetra.dataflowgram.worker.Worker
 import java.nio.file.Path
 import java.util.concurrent.CompletableFuture
 
-class RootDispatcher : GitListener {
+class RootDispatcher(gitConnector: GitConnector, private val configWsHandler: ConfigWsHandler) {
 
-  private val libHolder = LibHolder()
-  private val cache = FunctionsCache()
-  private val worker = Worker()
+  private val worker: Worker = Worker(gitConnector)
+  private val logger = LoggerFactory.getLogger(RootDispatcher::class.java)
 
   init {
     worker.start()
-  }
-
-  override suspend fun parseUpdate(newContent: GitContent) {
-    val updated = cache.update(newContent.version, newContent.serverSpace.functions)
-    libHolder.updateLib(updated)
-    worker.update()
+    var version = 0L
+    GlobalScope.launch {
+      while (true) {
+        try {
+          val update = worker.update(version).await()
+          update?.let {
+            version = it.version
+            logger.info("Sending update to client")
+            configWsHandler.parseUpdate(it)
+          }
+        } catch (ex: Exception) {
+          logger.error("Exception while updating ", ex)
+        }
+        delay(3000)
+      }
+    }
   }
 
   suspend fun initFile(name: String): CompletableFuture<String> {
@@ -47,10 +60,7 @@ class RootDispatcher : GitListener {
     params: Map<String, String> = emptyMap(),
     onMessageReceive: (String) -> Unit
   ): CompletableFuture<String> {
-    if (!cache.check(function, version)) {
-      return CompletableFuture.supplyAsync { throw Exception() }
-    }
-    return worker.execute(function, args, params, onMessageReceive)
+    return worker.execute(function, args, params, version, onMessageReceive)
   }
 }
 

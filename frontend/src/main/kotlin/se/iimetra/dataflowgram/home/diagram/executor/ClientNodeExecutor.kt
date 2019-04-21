@@ -23,10 +23,17 @@ class ClientNodeExecutor(node: NodeModel, var panel: DiagramExecutionPanel) : Ab
     val defNode = node as InitDefaultNode
     if (panel.canProcess) {
       panel.startNode(node)
-      val result = clientEventController.pushEvent(defNode.function, valueHolders.values.map { it.getValue()!! })
-      GlobalScope.launch {
-        panel.stopNode(node)
-        outData?.setValue(result)
+      try {
+        val result = clientEventController.pushEvent(defNode.function, valueHolders.values.map { it.getValue()!! })
+        GlobalScope.launch {
+          panel.stopNode(node)
+          outData?.setValue(result)
+        }
+      } catch (ex: Throwable) {
+        console.log(ex)
+        GlobalScope.launch {
+          panel.stopNode(node, ex.message)
+        }
       }
     }
   }

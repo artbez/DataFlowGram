@@ -28,10 +28,16 @@ class FunctionDescriptionView : RComponent<FunctionDescriptionView.Props, RState
         b { +"Signature:" }
         span { +props.function.meta.signature.toMathText() }
       }
-      props.function.meta.params?.let { params ->
+      props.function.meta.paramsMap.forEach { (key, value) ->
+        div("configurer-props__group") {
+          b { +"Param $key" }
+          span { +value }
+        }
+      }
+      props.function.meta.paramsMap?.let { params ->
         div("configurer-props__group") {
           b { +"Params:" }
-          span { +params }
+          span { +params.toString() }
         }
       }
       props.function.meta.description?.let { desc ->

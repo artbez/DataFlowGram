@@ -9,14 +9,18 @@ data class CacheValue(val version: Long, val description: FunctionDescription)
 class FunctionsCache {
   private val innerVersionCache = HashMap<FunctionId, CacheValue>()
 
-  @Synchronized
-  fun update(version: Long, functions: List<FunctionDescription>) = functions.mapNotNull { description ->
+  fun get(functions: List<FunctionDescription>) = functions.mapNotNull { description ->
     val previous = innerVersionCache[description.view.id]
     if (previous != null && previous.description == description) {
       return@mapNotNull null
     }
-    innerVersionCache[description.view.id] = CacheValue(version, description)
     return@mapNotNull description
+  }
+
+  fun update(version: Long, functions: List<FunctionDescription>) {
+    functions.forEach { description ->
+      innerVersionCache[description.view.id] = CacheValue(version, description)
+    }
   }
 
   @Synchronized

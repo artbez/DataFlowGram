@@ -1,6 +1,8 @@
 package se.iimetra.dataflowgram.worker
 
+import se.iimetra.dataflow.FunctionDescription
 import se.iimetra.dataflow.FunctionId
+import se.iimetra.dataflow.GitContent
 import se.iimetra.dataflowgram.root.ValueTypePair
 import java.nio.file.Path
 import java.util.concurrent.CompletableFuture
@@ -10,7 +12,10 @@ interface CompletableAction<T> {
 }
 
 sealed class WorkerAction {
-  object Update: WorkerAction()
+  data class Update(
+    val reqVersion: Long,
+    override val result: CompletableFuture<GitContent?>
+  ): CompletableAction<GitContent?>, WorkerAction()
 
   data class InitFile(
     val name: String,
@@ -37,6 +42,7 @@ sealed class WorkerAction {
     val function: FunctionId,
     val arguments: List<String> = emptyList(),
     val params: Map<String, String> = emptyMap(),
+    val version: Long = 0,
     val onMessageReceive: (String) -> Unit = {},
     override val result: CompletableFuture<String>
   ): CompletableAction<String>, WorkerAction()

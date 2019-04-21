@@ -5,18 +5,33 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
+import se.iimetra.dataflow.FunctionDescription
 import se.iimetra.dataflow.FunctionId
+import se.iimetra.dataflow.GitContent
+import se.iimetra.dataflowgram.git.GitConnector
 import se.iimetra.dataflowgram.root.ValueTypePair
-import java.nio.file.Files
+import se.iimetra.dataflowgram.worker.handlers.ConvertersHandler
+import se.iimetra.dataflowgram.worker.handlers.ExecutionHandler
+import se.iimetra.dataflowgram.worker.handlers.FileActionsHandler
+import se.iimetra.dataflowgram.worker.handlers.UpdateHandler
+import java.lang.Exception
+import java.lang.RuntimeException
 import java.nio.file.Path
-import java.nio.file.Paths
 import java.util.concurrent.CompletableFuture
 
 
-class Worker {
+class Worker(private val gitConnector: GitConnector) {
   private val actionQueue = Channel<WorkerAction>()
-  private lateinit var client: PythonServerClient
   private val logger = LoggerFactory.getLogger(Worker::class.java)
+
+  private lateinit var client: PythonServerClient
+  private lateinit var updateHandler: UpdateHandler
+  private lateinit var executionHandler: ExecutionHandler
+  private lateinit var convertersHandler: ConvertersHandler
+  private lateinit var fileActionsHandler: FileActionsHandler
+
+  @Volatile
+  private var blockQueueMsg: String? = null
 
 //  init {
 //    GlobalScope.launch {
@@ -34,46 +49,58 @@ class Worker {
   fun start() = GlobalScope.launch {
     delay(3000)
     client = PythonServerClient("localhost", 50051)
+    initHandlers()
+
     while (true) {
       val action = actionQueue.poll()
+      if (blockQueueMsg != null && action !is WorkerAction.Update) {
+        if (action is CompletableAction<*>) {
+          action.result.completeExceptionally(RuntimeException(blockQueueMsg))
+        }
+        continue
+      }
+
       when (action) {
         is WorkerAction.Update -> {
-          client.update()
+          try {
+            updateHandler.processUpdate(action)
+            val msg = blockQueueMsg
+            if (msg != null) {
+              logger.info("Unblocking Queue Processing")
+              blockQueueMsg = null
+            }
+          } catch (ex: Exception) {
+            blockQueueMsg = ex.message
+            logger.error("Blocking Queue Processing due to ", ex)
+          }
         }
         is WorkerAction.Execute -> {
-          logger.info("Executing ${action.function.name}")
-          val ref = client.executeCommand(action.function, action.arguments, action.params, action.onMessageReceive)
-          logger.info("${action.function.name} executed")
-          action.result.complete(ref)
+          if (!updateHandler.checkOutdated(action.function, action.version)) {
+            logger.warn("Incorrect version")
+            action.result.completeExceptionally(RuntimeException("Wrong version"))
+          } else {
+            executionHandler.processExecution(action)
+          }
         }
-        is WorkerAction.CreateFile -> {
-          val newPath = writeFile(action.path, action.name)
-          val fileRef = client.initFile(newPath)
-          action.result.complete(fileRef)
+        is WorkerAction.InData, is WorkerAction.OutData -> {
+          convertersHandler.processConversion(action)
         }
-        is WorkerAction.OutData -> {
-          val value = client.outCommand(action.ref, action.type)
-          action.result.complete(ValueTypePair(value, action.type))
-        }
-        is WorkerAction.InData -> {
-          val value = client.inCommand(action.data)
-          action.result.complete(ValueTypePair(value, action.data.type))
-        }
-        is WorkerAction.InitFile -> {
-          val fileRef = client.initFile(Paths.get("lib/${action.name}"))
-          action.result.complete(fileRef)
+        is WorkerAction.CreateFile, is WorkerAction.InitFile -> {
+          fileActionsHandler.processFileAction(action)
         }
       }
     }
   }
 
-  suspend fun update() {
-    actionQueue.send(WorkerAction.Update)
+  suspend fun update(reqVersion: Long): CompletableFuture<GitContent?> {
+    val future = CompletableFuture<GitContent?>()
+    actionQueue.send(WorkerAction.Update(reqVersion, future))
+    return future
   }
 
-  suspend fun execute(function: FunctionId, args: List<String>, params: Map<String, String>, onMessageReceive: (String) -> Unit): CompletableFuture<String> {
+  suspend fun execute(function: FunctionId, args: List<String>, params: Map<String, String>, version: Long, onMessageReceive: (String) -> Unit): CompletableFuture<String> {
     val future = CompletableFuture<String>()
-    actionQueue.send(WorkerAction.Execute(function, args, params, onMessageReceive, future))
+    actionQueue.send(WorkerAction.Execute(function, args, params, version, onMessageReceive, future))
     return future
   }
 
@@ -101,15 +128,10 @@ class Worker {
     return future
   }
 
-  private fun writeFile(path: Path, name: String): Path {
-    val file = Paths.get("lib/$name")
-    if (file.toFile().exists()) {
-      file.toFile().delete()
-    }
-    Files.copy(path, file)
-    return file.toAbsolutePath()
+  private fun initHandlers() {
+    updateHandler = UpdateHandler(gitConnector, client)
+    executionHandler = ExecutionHandler(client)
+    convertersHandler = ConvertersHandler(client)
+    fileActionsHandler = FileActionsHandler(client)
   }
-
-  private fun PythonServerClient.initFile(path: Path): String =
-    executeDefaultCommand("init_file", mapOf("path" to path.toAbsolutePath().toString(), "is_default_function" to "true"))
 }

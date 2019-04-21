@@ -3,13 +3,24 @@ import "google/protobuf/any.proto";
 
 option java_package = "se.iimetra.dataflowgram.worker";
 
-message Update {}
+message Update {
+    string repo = 1;
+    repeated FileLocation locations = 2;
+}
+
+message FileLocation {
+    string category = 1;
+    string file = 2;
+}
+
 message Updated {}
 
 message ExecutionRequest {
-    string function = 1;
-    repeated string args = 2;
-    map<string, string> params = 3;
+    string category = 1;
+    string file = 2;
+    string function = 3;
+    repeated string args = 4;
+    map<string, string> params = 5;
 }
 
 message ExecutionResult {

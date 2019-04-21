@@ -23,19 +23,25 @@ class ConverterExecutor(node: ConverterNode, var panel: DiagramExecutionPanel) :
       val panelId = panel.panelId
       val executionIndex = panel.executionList.size
       converterController.addListener({ it.executionPanelId == panelId && it.blockIndex == executionIndex }) { response ->
-        val res = response.result.let {
-          if (defNode.function.params["from"] == "client") it else
-            when (dataType) {
-              "String" -> it
-              "Int" -> it.toInt()
-              "Float" -> it.toFloat()
-              "Json" -> JSON.parse(it)
-              else -> throw IllegalStateException("Wrong converter type")
-            }
-        }
-        GlobalScope.launch {
-          panel.stopNode(node)
-          outData?.setValue(res)
+        if (response.error != null) {
+          GlobalScope.launch {
+            panel.stopNode(node, response.error)
+          }
+        } else {
+          val res = response.result!!.let {
+            if (defNode.function.params["from"] == "client") it else
+              when (dataType) {
+                "String" -> it
+                "Int" -> it.toInt()
+                "Float" -> it.toFloat()
+                "Json" -> JSON.parse(it)
+                else -> throw IllegalStateException("Wrong converter type")
+              }
+          }
+          GlobalScope.launch {
+            panel.stopNode(node)
+            outData?.setValue(res)
+          }
         }
       }
 

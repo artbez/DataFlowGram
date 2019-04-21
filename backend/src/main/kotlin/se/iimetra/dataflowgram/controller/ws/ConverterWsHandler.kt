@@ -21,10 +21,14 @@ class ConverterWsHandler(val dispatcher: RootDispatcher) {
     val converterFunc = connectors[objContent.systemFunctionId]!!
     process(converterFunc, objContent.arg)
       .thenAccept { serverResult ->
-        val converterResponse = ConverterEventResponse(objContent.systemFunctionId, objContent.executionPanelId, objContent.blockIndex, serverResult.value)
+        val converterResponse = ConverterEventResponse(objContent.systemFunctionId, objContent.executionPanelId, objContent.blockIndex, serverResult.value, null)
         val response = WsResponse("converter", kotlinx.serialization.json.Json.stringify(converterResponse))
         session.send(Mono.just(session.textMessage(Json.stringify(response)))).block()
         response
+      }.exceptionally { exception ->
+        val converterResponse = ConverterEventResponse(objContent.systemFunctionId, objContent.executionPanelId, objContent.blockIndex, null, exception.message)
+        val response = WsResponse("converter", kotlinx.serialization.json.Json.stringify(converterResponse))
+        session.send(Mono.just(session.textMessage(Json.stringify(response)))).block()
       }
   }
 

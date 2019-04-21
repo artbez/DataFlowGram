@@ -35,7 +35,6 @@ class MainWSHandler(
           "converter" -> converterWsHandler.processConverterRequest(session, request.content)
           else -> throw Exception()
         }.thenAccept {
-          logger.info(session.id)
           session.send(Mono.just(session.textMessage(Json.stringify(it)))).block()
         }
         Mono.`when`()

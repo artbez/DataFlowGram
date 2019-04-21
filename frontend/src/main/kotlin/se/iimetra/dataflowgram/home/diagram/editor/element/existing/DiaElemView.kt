@@ -40,10 +40,11 @@ class DiaElemView : RComponent<DiaElemView.Props, RState>() {
         b { +"Signature:" }
         span { +props.function.meta.signature.toMathText() }
       }
-      props.function.meta.params?.let { params ->
+      props.function.meta.paramsMap.forEach { (key, value) ->
         div("configurer-props__group") {
-          b { +"Params:" }
-          span { +params }
+          b { +"Param@ $key : $value" }
+          // TODO
+          input { }
         }
       }
       props.function.meta.description?.let { desc ->

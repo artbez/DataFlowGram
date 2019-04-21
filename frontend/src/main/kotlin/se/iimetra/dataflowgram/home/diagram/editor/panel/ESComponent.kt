@@ -32,7 +32,11 @@ class ESComponent : RComponent<ESComponent.Props, RState>() {
       div("configurer-props__group") {
         b { +"Status:" }
         div("execution-state-element__state") {
-          if (props.state.completed) +"Completed" else +"Executing..."
+          when {
+            props.state.errors != null -> +"Rejected"
+            props.state.completed -> +"Completed"
+            else -> +"Executing"
+          }
         }
       }
     }
@@ -49,8 +53,14 @@ class ESComponent : RComponent<ESComponent.Props, RState>() {
                 title = "Output"
               }
               div("log-box") {
-                pre {
-                  +(props.state.logs ?: emptyList()).joinToString("\n")
+                if (props.state.errors != null) {
+                  pre("log-error") {
+                    +props.state.errors!!
+                  }
+                } else {
+                  pre {
+                    +(props.state.logs ?: emptyList()).joinToString("\n")
+                  }
                 }
               }
             }

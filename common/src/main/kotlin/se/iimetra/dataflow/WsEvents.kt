@@ -22,7 +22,8 @@ data class ConverterEventResponse(
   val systemFunctionId: String,
   val executionPanelId: Long,
   val blockIndex: Int,
-  val result: String
+  val result: String?,
+  val error: String?
 )
 
 @Serializable
@@ -39,6 +40,7 @@ data class ServerResultEventResponse(
   val executionPanelId: Long,
   val blockIndex: Int,
   val msg: String?,
-  val ref: String?
+  val ref: String?,
+  val error: String?
 )
 

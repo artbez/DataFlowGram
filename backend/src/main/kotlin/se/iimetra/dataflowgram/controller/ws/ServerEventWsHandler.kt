@@ -20,15 +20,19 @@ class ServerEventWsHandler(val dispatcher: RootDispatcher) {
   fun processServerRequest(session: WebSocketSession, content: String) = GlobalScope.future {
     val objContent = Json.plain.parse<ServerEventRequest>(content)
     dispatcher.execute(objContent.functionId, objContent.arguments, objContent.version, emptyMap()) {
-      val serverResult = ServerResultEventResponse(objContent.executionPanelId, objContent.blockIndex, it, null)
+      val serverResult = ServerResultEventResponse(objContent.executionPanelId, objContent.blockIndex, it, null, null)
       val response = WsResponse("server", Json.stringify(serverResult))
       session.send(Mono.just(session.textMessage(Json.stringify(response)))).block()
       response
     }.thenAccept {
-      val serverResult = ServerResultEventResponse(objContent.executionPanelId, objContent.blockIndex, null, it)
+      val serverResult = ServerResultEventResponse(objContent.executionPanelId, objContent.blockIndex, null, it, null)
       val response = WsResponse("server", Json.stringify(serverResult))
       session.send(Mono.just(session.textMessage(Json.stringify(response)))).block()
       response
+    }.exceptionally { exception ->
+      val serverResult = ServerResultEventResponse(objContent.executionPanelId, objContent.blockIndex, null, null, exception.message)
+      val response = WsResponse("server", Json.stringify(serverResult))
+      session.send(Mono.just(session.textMessage(Json.stringify(response)))).block()
     }
   }
 }

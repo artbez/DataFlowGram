@@ -1,13 +1,12 @@
 package se.iimetra.dataflowgram.worker
 
-import com.google.protobuf.Descriptors
 import io.grpc.ManagedChannel
 import io.grpc.ManagedChannelBuilder
 import io.grpc.StatusRuntimeException
+import org.slf4j.LoggerFactory
 import se.iimetra.dataflow.FunctionId
-import se.iimetra.dataflowgram.lib.fullName
 import se.iimetra.dataflowgram.root.ValueTypePair
-import java.lang.IllegalStateException
+import se.iimetra.dataflowgram.worker.handlers.UpdateLocation
 import java.util.concurrent.TimeUnit
 import java.util.logging.Level
 import java.util.logging.Logger
@@ -25,6 +24,21 @@ class PythonServerClient internal constructor(private val channel: ManagedChanne
   @Throws(InterruptedException::class)
   fun shutdown() {
     channel.shutdown().awaitTermination(5, TimeUnit.SECONDS)
+  }
+
+  fun update(repo: String, locations: List<UpdateLocation>) {
+    val requestBuilder = Connector.Update.newBuilder()
+    requestBuilder.repo = repo
+    requestBuilder.addAllLocations(locations.map { Connector.FileLocation.newBuilder().setCategory(it.category).setFile(it.file).build() })
+
+    try {
+      blockingStub.updateLib(requestBuilder.build())
+    } catch (e: StatusRuntimeException) {
+      logger.error("RPC failed: {0}", e.status)
+      throw RuntimeException(e.status.description)
+    }
+
+    logger.info("Updated")
   }
 
   fun outCommand(ref: String, type: String): String {
@@ -60,7 +74,9 @@ class PythonServerClient internal constructor(private val channel: ManagedChanne
 
   fun executeCommand(functionMeta: FunctionId, args: List<String>, params: Map<String, String>, onMessageReceive: (String) -> Unit): String {
     val requestBuilder = Connector.ExecutionRequest.newBuilder()
-      .setFunction(fullName(functionMeta.category, functionMeta.file, functionMeta.name))
+      .setCategory(functionMeta.category)
+      .setFile(functionMeta.file)
+      .setFunction(functionMeta.name)
       .addAllArgs(args)
       .putAllParams(params)
 
@@ -69,8 +85,8 @@ class PythonServerClient internal constructor(private val channel: ManagedChanne
     val response = try {
       blockingStub.execute(request)
     } catch (e: StatusRuntimeException) {
-      logger.log(Level.WARNING, "RPC failed: {0}", e.status)
-      throw Exception()
+      logger.error("RPC failed: {0}", e.status)
+      throw RuntimeException(e.status.description)
     }
 
     response.forEach {
@@ -84,20 +100,7 @@ class PythonServerClient internal constructor(private val channel: ManagedChanne
     throw IllegalStateException("Should not be here")
   }
 
-  fun update(): Boolean {
-    val request = Connector.Update.newBuilder().build()//.setName(name).build()
-    try {
-      blockingStub.updateLib(request)
-    } catch (e: StatusRuntimeException) {
-      logger.log(Level.WARNING, "RPC failed: {0}", e.status)
-      return false
-    }
-
-    logger.info("Updated")
-    return true
-  }
-
   companion object {
-    private val logger = Logger.getLogger(PythonServerClient::class.java.name)
+    private val logger = LoggerFactory.getLogger(PythonServerClient::class.java.name)
   }
 }

@@ -8,17 +8,16 @@ import kotlinx.serialization.stringify
 import org.springframework.web.reactive.socket.WebSocketSession
 import reactor.core.publisher.Mono
 import se.iimetra.dataflow.*
-import se.iimetra.dataflowgram.git.GitListener
 import java.util.concurrent.CopyOnWriteArrayList
 
-class ConfigWsHandler : GitListener {
+class ConfigWsHandler {
   @Volatile
   private var currentConfig: GitContent = GitContent(-1, SpaceContent(emptyList()), SpaceContent(emptyList()))
 
   private val sessions = CopyOnWriteArrayList<WebSocketSession>()
 
-  @ImplicitReflectionSerializer
-  override suspend fun parseUpdate(newContent: GitContent) {
+  @UseExperimental(ImplicitReflectionSerializer::class)
+  fun parseUpdate(newContent: GitContent) {
     currentConfig = newContent
     val wsResponse = WsResponse("config", Json.plain.stringify(AllFunctions(currentConfig, connectors.values.toList())))
     sessions.forEach { session -> session.send(Mono.just(session.textMessage(Json.stringify(wsResponse)))).block() }
