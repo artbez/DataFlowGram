@@ -52,14 +52,18 @@ class ESComponent : RComponent<ESComponent.Props, RState>() {
                 id = "popover-select-output"
                 title = "Output"
               }
-              div("log-box") {
-                if (props.state.errors != null) {
-                  pre("log-error") {
-                    +props.state.errors!!
-                  }
-                } else {
-                  pre {
-                    +(props.state.logs ?: emptyList()).joinToString("\n")
+              if (props.state.component != null) {
+                buildElement { props.state.component }
+              } else {
+                div("log-box") {
+                  if (props.state.errors != null) {
+                    pre("log-error") {
+                      +props.state.errors!!
+                    }
+                  } else {
+                    pre {
+                      +(props.state.logs ?: emptyList()).joinToString("\n")
+                    }
                   }
                 }
               }

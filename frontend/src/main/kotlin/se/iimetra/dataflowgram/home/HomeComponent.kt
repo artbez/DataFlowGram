@@ -11,6 +11,7 @@ import se.iimetra.dataflowgram.home.diagram.SceneTransferObject
 import se.iimetra.dataflowgram.home.diagram.editor.editor
 import se.iimetra.dataflowgram.home.diagram.palette.palette
 import se.iimetra.dataflowgram.home.diagram.scene
+import se.iimetra.dataflowgram.wrappers.loadable
 import se.iimetra.dataflowgram.wrappers.react.diagrams.DiagramEngine
 
 class HomeComponent : RComponent<RProps, RState>() {
@@ -30,6 +31,7 @@ class HomeComponent : RComponent<RProps, RState>() {
   }
 
   override fun RBuilder.render() {
+    console.log(loadable.lib)
     header
     div("row home-all") {
       div("col-md-2 container-scroll") {

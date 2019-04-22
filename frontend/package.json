@@ -12,7 +12,9 @@
     "devextreme": "^18.2.7",
     "devextreme-react": "^18.2.7",
     "svgjs": "^2.6.2",
-    "svg-text": "^0.5.1"
+    "svg-text": "^0.5.1",
+    "@loadable/component": "^5.7.0",
+    "moment": "^2.24.0"
   },
   "devDependencies": {
     "css-loader": "^0.28.7",
@@ -25,10 +27,12 @@
     "sass-loader": "^6.0.7",
     "source-map-loader": "0.2.1",
     "style-loader": "^0.19.1",
-    "webpack": "3.4.1",
-    "webpack-dev-server": "2.8.2",
-    "webpack-merge": "4.1.0",
-    "websocket": "1.0.24"
+    "webpack": "4.30.0",
+    "webpack-dev-server": "3.3.1",
+    "webpack-merge": "4.2.1",
+    "webpack-cli": "^3.3.1",
+    "uglifyjs-3-webpack-plugin": "^1.2.4",
+    "websocket": "1.0.28"
   },
   "scripts": {
     "devServer": "webpack-dev-server --open --config webpack.dev.js",

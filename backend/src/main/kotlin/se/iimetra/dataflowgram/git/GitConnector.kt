@@ -42,7 +42,7 @@ class GitConnector(remoteRepo: String) {
     val dir = if (isPython) Paths.get("repo/python") else Paths.get("repo/js")
 
     val categories = Files.list(dir)
-      .filter { Files.isDirectory(it) && !it.fileName.toString().startsWith(".") }
+      .filter { Files.isDirectory(it) && !it.fileName.toString().startsWith(".") && !it.fileName.toString().contains("node modules") }
       .map { directory -> processCategory(directory, isPython) }
       .toList()
 

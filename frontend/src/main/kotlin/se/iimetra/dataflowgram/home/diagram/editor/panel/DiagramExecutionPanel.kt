@@ -17,9 +17,11 @@ class DiagramExecutionPanel(
 
   val executionList: MutableList<ExecutionState> = mutableListOf()
 
-  fun <T : NodeModel> startNode(node: T) {
-    executionList.add(ExecutionState(node))
+  fun <T : NodeModel> startNode(node: T): ExecutionState {
+    val state = ExecutionState(node)
+    executionList.add(state)
     onChange(executionList)
+    return state
   }
 
   fun <T : NodeModel> stopNode(node: T, errors: String? = null) {
@@ -45,5 +47,6 @@ data class ExecutionState(
   val node: NodeModel,
   var completed: Boolean = false,
   var logs: List<String>? = null,
-  var errors: String? = null
+  var errors: String? = null,
+  var component: dynamic = null
 )
