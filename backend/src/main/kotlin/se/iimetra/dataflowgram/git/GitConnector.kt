@@ -13,8 +13,8 @@ class GitConnector(remoteRepo: String) {
   val localRepoDirectory = Paths.get("repo")
 
   private val git: Git
-  private val pyParser = PythonFileParser()
-  private val jsParser = JsFileParser()
+  private val pureParser = PythonFileParser("pure")
+  private val renderParser = PythonFileParser("render")
   private val version = AtomicLong(0)
 
   init {
@@ -39,7 +39,7 @@ class GitConnector(remoteRepo: String) {
   }
 
   private fun lastVersion(isPython: Boolean): SpaceContent {
-    val dir = if (isPython) Paths.get("repo/python") else Paths.get("repo/js")
+    val dir = if (isPython) Paths.get("repo/pure") else Paths.get("repo/render")
 
     val categories = Files.list(dir)
       .filter { Files.isDirectory(it) && !it.fileName.toString().startsWith(".") && !it.fileName.toString().contains("node modules") }
@@ -51,29 +51,29 @@ class GitConnector(remoteRepo: String) {
         file.functions.map {
           FunctionDescription(
             it.meta,
-            FunctionTextView(FunctionId(category.name, file.name, it.name), it.args, it.lines)
+            FunctionTextView(FunctionId(it.meta.language, category.name, file.name, it.name), it.args, it.lines)
           )
         }
       }
     })
   }
 
-  private fun processCategory(path: Path, isPython: Boolean): CategoryContent {
+  private fun processCategory(path: Path, isPure: Boolean): CategoryContent {
     val data = Files.list(path).toList()
       .filter { Files.isRegularFile(it) }
-      .mapNotNull { leaf -> processFile(leaf, isPython)?.let { FileContent(leaf.shortFileName(), it) } }
+      .mapNotNull { leaf -> processFile(leaf, isPure)?.let { FileContent(leaf.shortFileName(), it) } }
       .toList()
     return CategoryContent(path.fileName.toString(), data)
   }
 
-  private fun processFile(path: Path, isPython: Boolean): List<CustomFunction>? {
+  private fun processFile(path: Path, isPure: Boolean): List<CustomFunction>? {
     val lines = Files.readAllLines(path)
     return when {
       lines.size == 0 -> null
-      isPython && !pyParser.check(lines[0]) -> null
-      !isPython && !jsParser.check(lines[0]) -> null
-      isPython -> pyParser.parse(version.get(), lines)
-      else -> jsParser.parse(version.get(), lines)
+      isPure && !pureParser.check(lines[0]) -> null
+      !isPure && !renderParser.check(lines[0]) -> null
+      isPure -> pureParser.parse(version.get(), lines)
+      else -> renderParser.parse(version.get(), lines)
     }
   }
 

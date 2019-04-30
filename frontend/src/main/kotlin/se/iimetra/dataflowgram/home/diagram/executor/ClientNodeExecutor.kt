@@ -3,8 +3,6 @@ package se.iimetra.dataflowgram.home.diagram.executor
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.ImplicitReflectionSerializer
-import react.buildElement
-import se.iimetra.dataflowgram.home.clientEventController
 import se.iimetra.dataflowgram.home.diagram.editor.panel.DiagramExecutionPanel
 import se.iimetra.dataflowgram.home.diagram.node.InitDefaultNode
 import se.iimetra.dataflowgram.home.eventController
@@ -23,43 +21,31 @@ class ClientNodeExecutor(node: NodeModel, var panel: DiagramExecutionPanel) : Ab
   override suspend fun execute() {
     val defNode = node as InitDefaultNode
     if (panel.canProcess) {
-      val state = panel.startNode(node)
-      try {
-        val result =
-          clientEventController.pushEvent(defNode.function, valueHolders.values.map { it.getValue()!! }, state)
-        if (result != null) {
-          console.log(result.size)
-          when {
-            result.size == 1 && node.outPort != null -> GlobalScope.launch {
-              panel.stopNode(node)
-              outData!!.setValue(result[0])
-            }
-            result.size == 1 && node.outPort == null -> {
-              state.component = result[0]
-              GlobalScope.launch {
-                panel.stopNode(node)
-              }
-            }
-            result.size == 2 -> {
-              state.component = result[1]
-              GlobalScope.launch {
-                panel.stopNode(node)
-                outData!!.setValue(result[0])
-              }
-            }
-            else -> throw Error("Can't parse result $result")
+      panel.startNode(node)
+      val panelId = panel.panelId
+      val executionIndex = panel.executionList.size
+      serverEventController.addListener({ it.executionPanelId == panelId && it.blockIndex == executionIndex }) { response ->
+        when {
+          response.error != null -> GlobalScope.launch {
+            panel.stopNode(node, response.error)
           }
-        } else {
-          GlobalScope.launch {
+
+          response.msg != null -> {}
+
+          else -> GlobalScope.launch {
+            println(response.ref)
+            panel.render(node, "png", response.ref!!)
             panel.stopNode(node)
+            outData?.setValue(response.ref)
           }
-        }
-      } catch (ex: Throwable) {
-        console.log(ex)
-        GlobalScope.launch {
-          panel.stopNode(node, ex.message)
         }
       }
+      eventController.pushServerEvent(
+        defNode.function,
+        valueHolders.values.map { it.getValue()!! },
+        panelId,
+        executionIndex
+      )
     }
   }
 

@@ -5,7 +5,6 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
-import se.iimetra.dataflow.FunctionDescription
 import se.iimetra.dataflow.FunctionId
 import se.iimetra.dataflow.GitContent
 import se.iimetra.dataflowgram.git.GitConnector
@@ -14,8 +13,6 @@ import se.iimetra.dataflowgram.worker.handlers.ConvertersHandler
 import se.iimetra.dataflowgram.worker.handlers.ExecutionHandler
 import se.iimetra.dataflowgram.worker.handlers.FileActionsHandler
 import se.iimetra.dataflowgram.worker.handlers.UpdateHandler
-import java.lang.Exception
-import java.lang.RuntimeException
 import java.nio.file.Path
 import java.util.concurrent.CompletableFuture
 
@@ -79,7 +76,10 @@ class Worker(private val gitConnector: GitConnector) {
             logger.warn("Incorrect version")
             action.result.completeExceptionally(RuntimeException("Wrong version"))
           } else {
-            executionHandler.processExecution(action)
+            val description = updateHandler.getFullFunction(action.function, action.version)
+              ?: throw IllegalStateException("Inconsistent state")
+
+            executionHandler.processExecution(action, description)
           }
         }
         is WorkerAction.InData, is WorkerAction.OutData -> {

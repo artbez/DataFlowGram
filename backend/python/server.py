@@ -18,7 +18,6 @@ _ONE_DAY_IN_SECONDS = 60 * 60 * 24
 
 cwd = os.getcwd()
 sys.path.append(cwd + '/lib/')
-sys.path.append('/Users/artemii.bezguzikov/project/DataFlowGram/lib/')
 
 global_vars = {}
 next_id = 0
@@ -29,14 +28,16 @@ def init_file(params):
 
 
 class ThreadWithReturnValue(threading.Thread):
-    def __init__(self, arg):
+    def __init__(self, arg, params):
         threading.Thread.__init__(self)
         self.arg = arg
         self._return = None
         self._error = None
+        self._params = params
 
     def run(self):
         try:
+            params = self._params
             self._return = eval(self.arg)
         except:
             tb = traceback.format_exc()
@@ -57,81 +58,67 @@ class ExecutionService(connector_pb2_grpc.ExecutorServicer):
         parsed = list(map(lambda x: 'global_vars[\'' + x + '\']', request.args))
         arg_string = ",".join(parsed)
         params = request.params
+        if params is None or params == {}:
+            params = {}
+
+        global next_id
+        next_id = next_id + 1
+
+        if request.language == 'render':
+            out_file = 'f' + str(next_id) + ExecutionService.__type_to_extension(request.targetType)
+            params['fileOut'] = global_vars['fileOut'] + '/' + out_file
 
         q = queue.Queue()
         log = Logger(q)
-        if params is None or params == {}:
 
-            old_stdout = sys.stdout
-            sys.stdout = log
-            foo = ThreadWithReturnValue(self.__getLocation(request.category, request.file) + '.' + request.function + '(' + arg_string + ')')
-            foo.start()
-            while foo.is_alive() or not log.get_q().empty():
-                try:
-                    elem = log.get_q().get(timeout=1)
-                    yield connector_pb2.ExecutionResult(msg=elem)
-                except queue.Empty:
-                    pass
-            try:
-                    res = foo.join()
-            except Exception as error:
-                raise error
-            finally:
-                sys.stdout = old_stdout
-
-            while not log.get_q().empty():
-                elem = log.get_q().get()
-                yield connector_pb2.ExecutionResult(msg=elem)
-
+        if arg_string is None or arg_string == '':
+            arg_suffix = ''
         else:
-            if params['is_default_function'] == "true":
-                prefix = ''
-            else:
-                prefix = self.__getLocation(request.category, request.file) + '.'
+            arg_suffix = ','
 
-            if arg_string is None or arg_string == '':
-                arg_suffix = ''
-            else:
-                arg_suffix = ','
-
-            old_stdout = sys.stdout
-            sys.stdout = log
-            foo = ThreadWithReturnValue(prefix + request.function + '(' + arg_string + ')')
-            foo.start()
-            while foo.is_alive():
-                try:
-                    elem = log.get_q().get(timeout=1)
-                    yield connector_pb2.ExecutionResult(msg=elem)
-                except queue.Empty:
-                    pass
-
+        old_stdout = sys.stdout
+        sys.stdout = log
+        prefix = self.__getLocation(request.category, request.file, request.language) + '.'
+        foo = ThreadWithReturnValue(prefix + request.function + '(' + arg_string + arg_suffix + 'params)', params)
+        foo.start()
+        while foo.is_alive():
             try:
-                res = foo.join()
-            except Exception as error:
-                raise error
-            finally:
-                sys.stdout = old_stdout
-
-            while not log.get_q().empty():
-                elem = log.get_q().get()
+                elem = log.get_q().get(timeout=1)
                 yield connector_pb2.ExecutionResult(msg=elem)
+            except queue.Empty:
+                pass
 
-        global next_id
-        next_name = 'i' + str(next_id)
-        next_id = next_id + 1
+        try:
+            res = foo.join()
+        except Exception as error:
+            raise error
+        finally:
+            sys.stdout = old_stdout
 
-        global_vars[next_name] = res
-        yield connector_pb2.ExecutionResult(ref=next_name)
+        while not log.get_q().empty():
+            elem = log.get_q().get()
+            yield connector_pb2.ExecutionResult(msg=elem)
+
+        if request.language == 'render':
+            yield connector_pb2.ExecutionResult(ref=res)
+        else:
+            next_name = 'i' + str(next_id)
+            next_id = next_id + 1
+
+            global_vars[next_name] = res
+            yield connector_pb2.ExecutionResult(ref=next_name)
 
     def UpdateLib(self, request, context):
         sys.path.append(request.repo)
+        global_vars['fileOut'] = request.fileOut
+
         for location in request.locations:
-            new_path = request.repo + '/python/' + location.category
+            new_path = request.repo + '/' + location.language + '/' + location.category
             if new_path not in sys.path:
-                sys.path.append(request.repo + '/python/' + location.category)
+                sys.path.append(request.repo + '/' + location.language + '/' + location.category)
             module = __import__(location.file)
             reload(module)
-            globals()[self.__getLocation(location.category, location.file)] = module
+            globals()[self.__getLocation(location.category, location.file, location.language)] = module
 
         return connector_pb2.Updated()
 
@@ -156,17 +143,21 @@ class ExecutionService(connector_pb2_grpc.ExecutorServicer):
         if type == "Json":
             res = json.load(request.value)
 
-        global next_id
         next_name = 'i' + str(next_id)
-        next_id = next_id + 1
 
         global_vars[next_name] = res
 
         return connector_pb2.InResult(ref=next_name)
 
     @staticmethod
-    def __getLocation(category, file):
-        return 'myc_' + category + '_' + file
+    def __getLocation(category, file, language):
+        return 'myc_' + category + '_' + file + '_' + language
+
+    @staticmethod
+    def __type_to_extension(type):
+        if type == "PNG":
+            return ".png"
+        return ".jpeg"
 
 
 class Logger(object):

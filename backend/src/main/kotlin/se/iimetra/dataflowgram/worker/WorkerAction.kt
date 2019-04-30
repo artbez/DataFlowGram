@@ -2,6 +2,7 @@ package se.iimetra.dataflowgram.worker
 
 import se.iimetra.dataflow.FunctionDescription
 import se.iimetra.dataflow.FunctionId
+import se.iimetra.dataflow.FunctionSignature
 import se.iimetra.dataflow.GitContent
 import se.iimetra.dataflowgram.root.ValueTypePair
 import java.nio.file.Path

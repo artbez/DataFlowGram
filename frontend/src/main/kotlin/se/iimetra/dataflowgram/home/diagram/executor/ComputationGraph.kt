@@ -42,7 +42,7 @@ class ComputationGraph(nodes: List<NodeModel>, panel: DiagramExecutionPanel) {
 
   private fun createExecutor(node: NodeModel, panel: DiagramExecutionPanel): AbstractNodeExecutor {
     return when (node) {
-      is InitDefaultNode -> if (node.function.meta.language == "js") ClientNodeExecutor(node, panel)
+      is InitDefaultNode -> if (node.function.meta.language == "render") ClientNodeExecutor(node, panel)
                             else ServerNodeExecutor(node, panel)
       is ConverterNode -> ConverterExecutor(node, panel)
       else -> throw IllegalStateException("Wrong executor")

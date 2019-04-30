@@ -7,7 +7,7 @@ import se.iimetra.dataflow.FunctionId
 data class CacheValue(val version: Long, val description: FunctionDescription)
 
 class FunctionsCache {
-  private val innerVersionCache = HashMap<FunctionId, CacheValue>()
+  val innerVersionCache = HashMap<FunctionId, CacheValue>()
 
   fun get(version: Long, functions: List<FunctionDescription>) = functions.mapNotNull { description ->
     val previous = innerVersionCache[description.view.id]

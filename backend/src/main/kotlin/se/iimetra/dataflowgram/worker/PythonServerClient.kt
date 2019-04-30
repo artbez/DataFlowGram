@@ -5,6 +5,7 @@ import io.grpc.ManagedChannelBuilder
 import io.grpc.StatusRuntimeException
 import org.slf4j.LoggerFactory
 import se.iimetra.dataflow.FunctionId
+import se.iimetra.dataflow.FunctionSignature
 import se.iimetra.dataflowgram.root.ValueTypePair
 import se.iimetra.dataflowgram.worker.handlers.UpdateLocation
 import java.util.concurrent.TimeUnit
@@ -26,10 +27,17 @@ class PythonServerClient internal constructor(private val channel: ManagedChanne
     channel.shutdown().awaitTermination(5, TimeUnit.SECONDS)
   }
 
-  fun update(repo: String, locations: List<UpdateLocation>) {
+  fun update(repo: String, fileOut: String, locations: List<UpdateLocation>) {
     val requestBuilder = Connector.Update.newBuilder()
     requestBuilder.repo = repo
-    requestBuilder.addAllLocations(locations.map { Connector.FileLocation.newBuilder().setCategory(it.category).setFile(it.file).build() })
+    requestBuilder.fileOut = fileOut
+    requestBuilder.addAllLocations(locations.map {
+      Connector.FileLocation.newBuilder()
+        .setCategory(it.category)
+        .setFile(it.file)
+        .setLanguage(it.language)
+        .build()
+    })
 
     try {
       blockingStub.updateLib(requestBuilder.build())
@@ -72,10 +80,17 @@ class PythonServerClient internal constructor(private val channel: ManagedChanne
     throw IllegalStateException("Should not be here")
   }
 
-  fun executeCommand(functionMeta: FunctionId, args: List<String>, params: Map<String, String>, onMessageReceive: (String) -> Unit): String {
+  fun executeCommand(
+    functionMeta: FunctionId,
+    signature: FunctionSignature,
+    args: List<String>, params: Map<String, String>,
+    onMessageReceive: (String) -> Unit
+  ): String {
     val requestBuilder = Connector.ExecutionRequest.newBuilder()
       .setCategory(functionMeta.category)
       .setFile(functionMeta.file)
+      .setLanguage(functionMeta.language)
+      .setTargetType(signature.output)
       .setFunction(functionMeta.name)
       .addAllArgs(args)
       .putAllParams(params)

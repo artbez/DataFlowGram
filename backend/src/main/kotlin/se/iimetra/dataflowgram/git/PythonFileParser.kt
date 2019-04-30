@@ -3,9 +3,8 @@ package se.iimetra.dataflowgram.git
 import se.iimetra.dataflow.CustomFunction
 import java.util.regex.Pattern
 
-class PythonFileParser : AbstractParser() {
+class PythonFileParser(override val language: String) : AbstractParser() {
 
-  override val language: String = "python"
   override val comment: String = "#"
   override val functionCodeName: Pattern = Pattern.compile("def (.*?)\\((.*?)\\):")
 

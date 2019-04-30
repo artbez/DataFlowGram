@@ -52,8 +52,12 @@ class ESComponent : RComponent<ESComponent.Props, RState>() {
                 id = "popover-select-output"
                 title = "Output"
               }
-              if (props.state.component != null) {
-                buildElement { props.state.component }
+              if (props.state.renderPng != null) {
+                img {
+                  attrs {
+                    src = props.state.renderPng!!
+                  }
+                }
               } else {
                 div("log-box") {
                   if (props.state.errors != null) {

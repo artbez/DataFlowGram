@@ -10,8 +10,8 @@ import kotlin.js.json
 private const val POST = "POST"
 private const val GET = "GET"
 
-suspend fun get(url: String, body: dynamic = null): String {
-  val response = request(GET, url, body)
+suspend fun get(url: String, body: dynamic = null, headers: dynamic): String {
+  val response = request(GET, url, body, headers)
   if (!response.ok) {
     window.alert(response.text().await())
     throw RuntimeException("Exception when get")

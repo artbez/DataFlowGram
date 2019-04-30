@@ -1,6 +1,7 @@
 package se.iimetra.dataflowgram.worker.handlers
 
 import org.slf4j.LoggerFactory
+import org.springframework.core.io.ClassPathResource
 import se.iimetra.dataflow.FunctionDescription
 import se.iimetra.dataflow.FunctionId
 import se.iimetra.dataflowgram.git.GitConnector
@@ -15,6 +16,7 @@ class UpdateHandler(private val gitConnector: GitConnector, private val client: 
   private val updateList = ArrayList<UpdateLocation>()
 
   fun checkOutdated(functionId: FunctionId, version: Long) = cache.check(functionId, version)
+  fun getFullFunction(functionId: FunctionId, version: Long) = cache.innerVersionCache[functionId]?.description
 
   @Synchronized
   fun processUpdate(action: WorkerAction.Update) {
@@ -25,12 +27,13 @@ class UpdateHandler(private val gitConnector: GitConnector, private val client: 
       return
     }
 
-    val updated = cache.get(gitContent.version, gitContent.serverSpace.functions)
+    val updated = cache.get(gitContent.version, gitContent.allFunctions())
     val files = toLocations(updated)
     val repo = gitConnector.localRepoDirectory.toAbsolutePath().toString()
+    val fileOut = ClassPathResource("public/imgs").file
 
     try {
-      client.update(repo, files)
+      client.update(repo, fileOut.absolutePath.toString(), files)
       cache.update(gitContent.version, updated)
       action.result.complete(gitContent)
     } catch (ex: Exception) {
@@ -43,11 +46,11 @@ class UpdateHandler(private val gitConnector: GitConnector, private val client: 
   private fun toLocations(funcs: List<FunctionDescription>): List<UpdateLocation> {
     val files = funcs
       .groupBy { it.view.id.category }
-      .flatMap { group -> group.value.map { UpdateLocation(group.key, it.view.id.file) } }
+      .flatMap { group -> group.value.map { UpdateLocation(group.key, it.view.id.file, it.meta.language) } }
       .toSet()
 
     return files.toList()
   }
 }
 
-data class UpdateLocation(val category: String, val file: String)
+data class UpdateLocation(val category: String, val file: String, val language: String)

@@ -38,8 +38,17 @@ class DiagramExecutionPanel(
   fun <T : NodeModel> update(node: T, msg: String) {
     val state = executionList.find { it.node == node } ?: return
     val currentLogs = state.logs ?: emptyList()
+    state.renderPng = null
     state.logs = currentLogs.plus(msg)
     onChange(executionList)
+  }
+
+  fun <T : NodeModel> render(node: T, type: String, value: String) {
+    val state = executionList.find { it.node == node } ?: return
+    if (type == "png") {
+      state.renderPng = "imgs/$value"
+      onChange(executionList)
+    }
   }
 }
 
@@ -48,5 +57,5 @@ data class ExecutionState(
   var completed: Boolean = false,
   var logs: List<String>? = null,
   var errors: String? = null,
-  var component: dynamic = null
+  var renderPng: String? = null
 )

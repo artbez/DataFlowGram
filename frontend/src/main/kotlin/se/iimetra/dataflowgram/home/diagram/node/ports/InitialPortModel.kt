@@ -38,11 +38,11 @@ class InitialPortModel(val sname: String, val type: PortType, val index: Int) : 
   override fun canLinkToPort(port: InitialPortModel): Boolean {
     val curNode = getNode()
     val otherNode = port.getNode()
-    if (curNode is InitDefaultNode && otherNode is InitDefaultNode) {
-      if (curNode.function.meta.language != otherNode.function.meta.language) {
-        return false
-      }
-    }
+//    if (curNode is InitDefaultNode && otherNode is InitDefaultNode) {
+//      if (curNode.function.meta.language != otherNode.function.meta.language) {
+//        return false
+//      }
+//    }
     return type != port.type && sname == port.sname && curNode != otherNode
        // && getLinks().toMap().size == 1 && port.getLinks().toMap().size == 1
   }

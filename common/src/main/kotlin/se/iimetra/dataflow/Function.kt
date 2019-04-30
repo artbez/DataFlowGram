@@ -11,7 +11,7 @@ fun FunctionSignature.toMathText() = "(${input.joinToString(",") { it.trim() }})
 data class FunctionMeta(val label: String, val signature: FunctionSignature, val paramsMap: Map<String, String>, val description: String?, val version: Long, val language: String)
 
 @Serializable
-data class FunctionId(val category: String, val file: String, val name: String)
+data class FunctionId(val language: String, val category: String, val file: String, val name: String)
 
 @Serializable
 data class FunctionTextView(val id: FunctionId, val args: String, val content: List<String>)
@@ -28,7 +28,9 @@ data class SystemFunction(val functionSignature: FunctionSignature, val name: St
 fun FunctionDescription.fullId() = "${meta.language}__${view.id.category}__${view.id.file}__${view.id.name}"
 
 @Serializable
-data class GitContent(val version: Long, val serverSpace: SpaceContent, val clientSpace: SpaceContent)
+data class GitContent(val version: Long, val serverSpace: SpaceContent, val clientSpace: SpaceContent) {
+  fun allFunctions() = serverSpace.functions + clientSpace.functions
+}
 
 @Serializable
 data class AllFunctions(val git: GitContent, val connectors: List<SystemFunction>)

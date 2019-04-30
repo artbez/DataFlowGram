@@ -5,12 +5,14 @@ option java_package = "se.iimetra.dataflowgram.worker";
 
 message Update {
     string repo = 1;
-    repeated FileLocation locations = 2;
+    string fileOut = 2;
+    repeated FileLocation locations = 3;
 }
 
 message FileLocation {
     string category = 1;
     string file = 2;
+    string language = 3;
 }
 
 message Updated {}
@@ -18,9 +20,11 @@ message Updated {}
 message ExecutionRequest {
     string category = 1;
     string file = 2;
-    string function = 3;
-    repeated string args = 4;
-    map<string, string> params = 5;
+    string language = 3;
+    string function = 4;
+    string targetType = 5;
+    repeated string args = 6;
+    map<string, string> params = 7;
 }
 
 message ExecutionResult {

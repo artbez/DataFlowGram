@@ -1,6 +1,6 @@
 .diagram-net {
 
-  &__node_js {
+  &__node_render {
     // position: absolute;
     display: inline-block;
     background-color: aliceblue;
@@ -12,7 +12,7 @@
     }
   }
 
-  &__node_python {
+  &__node_pure {
     // position: absolute;
     display: inline-block;
     background-color: aliceblue;
