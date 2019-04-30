@@ -3,7 +3,6 @@ package se.iimetra.dataflowgram.git
 import se.iimetra.dataflow.CustomFunction
 import se.iimetra.dataflow.FunctionMeta
 import se.iimetra.dataflow.FunctionSignature
-import se.iimetra.dataflowgram.worker.WorkerAction
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
@@ -13,10 +12,10 @@ abstract class AbstractParser {
   protected abstract val comment: String
   protected abstract val functionCodeName: Pattern
 
-  private val functionNamePattern = lazy { Pattern.compile("$comment function=(.*?)") }
+  private val functionNamePattern = lazy { Pattern.compile("$comment function=(.*?)$") }
   private val signaturePattern = lazy { Pattern.compile("$comment signature=\\((.*?)\\)->(.+?)$") }
-  private val paramsPattern = lazy { Pattern.compile("$comment param@(.*?)=(.*?)") }
-  private val descriptionPattern = lazy { Pattern.compile("$comment description=(.*?)") }
+  private val paramsPattern = lazy { Pattern.compile("$comment param@(.*?):(.*?)$") }
+  private val descriptionPattern = lazy { Pattern.compile("$comment description=(.*?)$") }
 
   protected abstract fun parseBodyLine(
     state: ParserState.FunctionBodyState,
@@ -41,6 +40,7 @@ abstract class AbstractParser {
 
           is ParserState.FunctionMetaState -> when {
             line.startsWith(comment) -> state.builder.parseFunctionMeta(line)
+
             startFunctionBody(line) -> {
               val bodyBuilder = FunctionBodyBuilder()
               find(functionCodeName, line) { matcher ->
@@ -76,8 +76,9 @@ abstract class AbstractParser {
   }
 
   private fun startFunctionMeta(line: String): Boolean {
-    val matchFunctionName = functionNamePattern.value.matcher(line)
-    val matchFunctionSignature = signaturePattern.value.matcher(line)
+    val noSpaces = line
+    val matchFunctionName = functionNamePattern.value.matcher(noSpaces)
+    val matchFunctionSignature = signaturePattern.value.matcher(noSpaces)
     return matchFunctionName.find() || matchFunctionSignature.find()
   }
 
@@ -87,23 +88,24 @@ abstract class AbstractParser {
   }
 
   private fun FunctionMetaBuilder.parseFunctionMeta(line: String) {
-    find(functionNamePattern.value, line) { matcher ->
+    val noSpace = line
+    find(functionNamePattern.value, noSpace) { matcher ->
       label = matcher.group(1)
     }
 
-    find(signaturePattern.value, line) { matcher ->
+    find(signaturePattern.value, noSpace) { matcher ->
       signature = FunctionSignature(
         matcher.group(1).split(",").map { it.trim() }.toList(),
         matcher.group(2)
       )
     }
 
-    find(paramsPattern.value, line) { matcher ->
+    find(paramsPattern.value, noSpace) { matcher ->
       paramsMap[matcher.group(1)] = matcher.group(2)
     }
 
     find(descriptionPattern.value, line) { matcher ->
-      description = matcher.group(1)
+      description = matcher.group(1).split("\\n")
     }
   }
 
@@ -125,7 +127,7 @@ data class FunctionMetaBuilder(
   var label: String? = null,
   var signature: FunctionSignature? = null,
   var paramsMap: MutableMap<String, String> = mutableMapOf(),
-  var description: String? = null
+  var description: List<String> = emptyList()
 ) {
   fun build(realName: String, version: Long, language: String) =
     FunctionMeta(label ?: realName, signature!!, paramsMap, description, version, language)

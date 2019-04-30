@@ -1,5 +1,6 @@
 package se.iimetra.dataflowgram.home.diagram.editor.element.new
 
+import kotlinx.html.InputType
 import react.*
 import react.dom.*
 import se.iimetra.dataflow.FunctionDescription
@@ -28,22 +29,24 @@ class FunctionDescriptionView : RComponent<FunctionDescriptionView.Props, RState
         b { +"Signature:" }
         span { +props.function.meta.signature.toMathText() }
       }
-      props.function.meta.paramsMap.forEach { (key, value) ->
-        div("configurer-props__group") {
-          b { +"Param $key" }
-          span { +value }
-        }
-      }
-      props.function.meta.paramsMap?.let { params ->
+      if (props.function.meta.paramsMap.isNotEmpty()) {
         div("configurer-props__group") {
           b { +"Params:" }
-          span { +params.toString() }
+          span {
+            props.function.meta.paramsMap.forEach { param ->
+              div("params-pair") {
+                span { +param.key }
+                span { +":" }
+                i (classes = "params-input") { +param.value }
+              }
+            }
+          }
         }
       }
-      props.function.meta.description?.let { desc ->
+      if (props.function.meta.description.isNotEmpty()) {
         div("configurer-props__group") {
           b { +"Description:" }
-          span { +desc }
+          span("descr-span") { +props.function.meta.description.joinToString("\n") }
         }
       }
       div("configurer-props__group") {
@@ -77,7 +80,7 @@ class FunctionDescriptionView : RComponent<FunctionDescriptionView.Props, RState
           attrs {
             label = props.function.view.id.name
             sceneTransfer = props.sceneTransferObject
-            this.nodeProducer = {  DefaultNodeFactory.instance.getNewInstance(props.function) }
+            this.nodeProducer = { DefaultNodeFactory.instance.getNewInstance(props.function) }
           }
           defaultNodeWidget {
             attrs {
@@ -91,5 +94,5 @@ class FunctionDescriptionView : RComponent<FunctionDescriptionView.Props, RState
   }
 }
 
-fun RBuilder.functionDescriptionView(handler: RHandler<FunctionDescriptionView.Props>)
-    = child(FunctionDescriptionView::class, handler)
+fun RBuilder.functionDescriptionView(handler: RHandler<FunctionDescriptionView.Props>) =
+  child(FunctionDescriptionView::class, handler)

@@ -1,5 +1,6 @@
 package se.iimetra.dataflowgram.home.diagram.editor.element.existing
 
+import kotlinx.html.InputType
 import kotlinx.html.js.onClickFunction
 import react.*
 import react.dom.*
@@ -40,17 +41,34 @@ class DiaElemView : RComponent<DiaElemView.Props, RState>() {
         b { +"Signature:" }
         span { +props.function.meta.signature.toMathText() }
       }
-      props.function.meta.paramsMap.forEach { (key, value) ->
+      if (props.function.meta.paramsMap.isNotEmpty()) {
         div("configurer-props__group") {
-          b { +"Param@ $key : $value" }
-          // TODO
-          input { }
+          b { +"Params:" }
+          span {
+            props.function.meta.paramsMap.forEach { param ->
+              div("params-pair") {
+                div {
+                  span { +param.key }
+                  i { +" (${param.value})" }
+                }
+                input(classes = "params-input") {
+                  attrs {
+                    type = when (param.value) {
+                      "string" -> InputType.text
+                      "int", "float" -> InputType.number
+                      else -> TODO()
+                    }
+                  }
+                }
+              }
+            }
+          }
         }
       }
-      props.function.meta.description?.let { desc ->
+      if (props.function.meta.description.isNotEmpty()) {
         div("configurer-props__group") {
           b { +"Description:" }
-          span { +desc }
+          span("descr-span") { +props.function.meta.description.joinToString("\n") }
         }
       }
       div("configurer-props__group") {

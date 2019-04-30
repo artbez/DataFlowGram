@@ -8,7 +8,7 @@ data class FunctionSignature(val input: List<String>, val output: String)
 fun FunctionSignature.toMathText() = "(${input.joinToString(",") { it.trim() }}) -> $output"
 
 @Serializable
-data class FunctionMeta(val label: String, val signature: FunctionSignature, val paramsMap: Map<String, String>, val description: String?, val version: Long, val language: String)
+data class FunctionMeta(val label: String, val signature: FunctionSignature, val paramsMap: Map<String, String>, val description: List<String>, val version: Long, val language: String)
 
 @Serializable
 data class FunctionId(val language: String, val category: String, val file: String, val name: String)

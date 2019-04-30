@@ -42,7 +42,7 @@ class DefNodeWidget : RComponent<DefNodeWidget.Props, RState>() {
   override fun RBuilder.render() {
     val add_class = props.defaultNode.function.meta.language
     div("diagram-net__node_$add_class") {
-      span("diagram-net__node__span") { +props.defaultNode.function.view.id.name }
+      span("diagram-net__node__span") { +props.defaultNode.function.meta.label }
       if (props.isView != true) {
         val sided = listOf(PortPosition.Left, PortPosition.Bottom, PortPosition.Top).subList(0, props.defaultNode.portsList.size)
         val positioned = props.defaultNode.portsList.zip(sided)

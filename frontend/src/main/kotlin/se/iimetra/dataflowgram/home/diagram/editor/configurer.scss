@@ -142,3 +142,16 @@ $blue_color: rgb(0, 192, 255);
 .log-error {
   color: red;
 }
+
+.params-pair {
+  display: flex;
+  justify-content: space-between;
+}
+
+.params-input {
+  margin-left: 1rem;
+}
+
+.descr-span {
+  margin-left: 2rem;
+}
