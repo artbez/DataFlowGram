@@ -33,6 +33,12 @@ class DiaElemView(props: Props) : RComponent<DiaElemView.Props, DiaElemView.Stat
     paramValues = props.function.paramValues
   }
 
+  override fun componentWillReceiveProps(nextProps: Props) {
+    setState {
+      paramValues = nextProps.function.paramValues
+    }
+  }
+
   override fun RBuilder.render() {
     div("configurer-props") {
       div("configurer-props__group") {
@@ -69,7 +75,7 @@ class DiaElemView(props: Props) : RComponent<DiaElemView.Props, DiaElemView.Stat
                       "int", "float" -> InputType.number
                       else -> TODO()
                     }
-                    value = props.function.paramValues[param.key] ?: if (param.value == "string") "" else "0"
+                    value = state.paramValues[param.key] ?: if (param.value == "string") "" else "0"
                     onInputFunction = {
                       val newValue = it.target.asDynamic().value
                       print(newValue)
@@ -83,7 +89,7 @@ class DiaElemView(props: Props) : RComponent<DiaElemView.Props, DiaElemView.Stat
             }
           }
         }
-      }
+     }
       if (props.function.meta.description.isNotEmpty()) {
         div("configurer-props__group") {
           b { +"Description:" }

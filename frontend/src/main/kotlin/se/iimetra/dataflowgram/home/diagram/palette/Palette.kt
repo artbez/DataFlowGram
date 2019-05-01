@@ -13,7 +13,6 @@ import se.iimetra.dataflow.fullId
 import se.iimetra.dataflow.toMathText
 import se.iimetra.dataflowgram.home.configController
 import se.iimetra.dataflowgram.home.diagram.palette.blocks.categoryBlock
-import se.iimetra.dataflowgram.home.paletteDefaultChoseController
 import se.iimetra.dataflowgram.home.paletteSystemChoseController
 import se.iimetra.dataflowgram.wrappers.react.devextreme.TreeView
 import se.iimetra.dataflowgram.wrappers.react.tabs.Tab
@@ -24,17 +23,17 @@ import se.iimetra.dataflowgram.wrappers.react.tabs.Tabs
 class Palette : RComponent<RProps, Palette.State>() {
 
   override fun State.init() {
-    serverCategories = emptyList()
-    clientCategories = emptyList()
-    converters = emptyList()
+    pureCategories = emptyList()
+    renderCategories = emptyList()
+    resourceCategories = emptyList()
   }
 
   override fun componentDidMount() {
     configController.addListener { newConfig ->
       setState {
-        serverCategories = toViewCategories(newConfig.git.serverSpace.functions)
-        clientCategories = toViewCategories(newConfig.git.clientSpace.functions)
-        converters = systemToViewCells(newConfig.connectors)
+        pureCategories = toViewCategories(newConfig.git.pureSpace.functions)
+        renderCategories = toViewCategories(newConfig.git.renderSpace.functions)
+        resourceCategories = toViewCategories(newConfig.git.resourceSpace.functions)
       }
     }
   }
@@ -51,18 +50,18 @@ class Palette : RComponent<RProps, Palette.State>() {
       Tabs {
         TabList {
           Tab {
-            +"Server"
+            +"Pure"
           }
           Tab {
-            +"Client"
+            +"Render"
           }
           Tab {
-            +"Converters"
+            +"Resource"
           }
         }
         TabPanel {
-          if (state.serverCategories.isNotEmpty()) {
-            state.serverCategories.forEach {
+          if (state.pureCategories.isNotEmpty()) {
+            state.pureCategories.forEach {
               categoryBlock {
                 attrs {
                   name = it.category
@@ -73,8 +72,8 @@ class Palette : RComponent<RProps, Palette.State>() {
           }
         }
         TabPanel {
-          if (state.clientCategories.isNotEmpty()) {
-            state.clientCategories.forEach {
+          if (state.renderCategories.isNotEmpty()) {
+            state.renderCategories.forEach {
               categoryBlock {
                 attrs {
                   name = it.category
@@ -85,28 +84,41 @@ class Palette : RComponent<RProps, Palette.State>() {
           }
         }
         TabPanel {
-          if (state.converters.isNotEmpty()) {
-            TreeView {
-              attrs {
-                id = "converters"
-                items = kotlin.js.JSON.parse(Json.plain.stringify(state.converters))
-                searchEnabled = false
-                onItemClick = {
-                  if (it.itemData.items == null) {
-                    paletteSystemChoseController.newChoose(it.itemData.id as String)
-                  }
+          if (state.resourceCategories.isNotEmpty()) {
+            state.resourceCategories.forEach {
+              categoryBlock {
+                attrs {
+                  name = it.category
+                  content = it.cells
                 }
               }
             }
           }
         }
+//        TabPanel {
+//          if (state.converters.isNotEmpty()) {
+//            TreeView {
+//              attrs {
+//                id = "converters"
+//                items = kotlin.js.JSON.parse(Json.plain.stringify(state.converters))
+//                searchEnabled = false
+//                onItemClick = {
+//                  if (it.itemData.items == null) {
+//                    paletteSystemChoseController.newChoose(it.itemData.id as String)
+//                  }
+//                }
+//              }
+//            }
+//          }
+//        }
       }
     }
   }
 
   interface State : RState {
-    var serverCategories: List<ViewCategory>
-    var clientCategories: List<ViewCategory>
+    var pureCategories: List<ViewCategory>
+    var renderCategories: List<ViewCategory>
+    var resourceCategories: List<ViewCategory>
     var converters: List<ViewCell>
   }
 

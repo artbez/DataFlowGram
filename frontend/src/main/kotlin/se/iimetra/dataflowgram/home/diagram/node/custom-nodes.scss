@@ -24,6 +24,18 @@
     }
   }
 
+  &__node_resource {
+    // position: absolute;
+    display: inline-block;
+    background-color: aliceblue;
+    border: 4px solid #dba311;
+
+    &__span {
+      font-size: 18px;
+      padding: 3px;
+    }
+  }
+
   &__port {
 
     position: absolute;

@@ -119,11 +119,6 @@ class Editor : RComponent<Editor.Props, Editor.State>() {
               engine = props.engine
             }
           }
-          is ConverterNode -> systemDiaElemView {
-            attrs {
-              function = (state.selectedNode as ConverterNode).function
-            }
-          }
           else -> throw IllegalStateException("Impossible")
         }
       }

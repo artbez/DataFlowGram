@@ -88,19 +88,18 @@ abstract class AbstractParser {
   }
 
   private fun FunctionMetaBuilder.parseFunctionMeta(line: String) {
-    val noSpace = line
-    find(functionNamePattern.value, noSpace) { matcher ->
+    find(functionNamePattern.value, line) { matcher ->
       label = matcher.group(1)
     }
 
-    find(signaturePattern.value, noSpace) { matcher ->
+    find(signaturePattern.value, line) { matcher ->
       signature = FunctionSignature(
         matcher.group(1).split(",").map { it.trim() }.toList(),
         matcher.group(2)
       )
     }
 
-    find(paramsPattern.value, noSpace) { matcher ->
+    find(paramsPattern.value, line) { matcher ->
       paramsMap[matcher.group(1)] = matcher.group(2)
     }
 

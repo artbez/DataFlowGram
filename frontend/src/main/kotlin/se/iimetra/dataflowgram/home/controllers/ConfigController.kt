@@ -14,7 +14,10 @@ interface ConfigUpdateListener {
 
 class ConfigController {
 
-  var gitContent = AllFunctions(GitContent(-1, SpaceContent(emptyList()), SpaceContent(emptyList())), emptyList())
+  var gitContent = AllFunctions(
+    GitContent(-1, SpaceContent(emptyList()), SpaceContent(emptyList()), SpaceContent(emptyList())),
+    emptyList()
+  )
   private val listeners = mutableListOf<(AllFunctions) -> Unit>()
 
   fun push(all: AllFunctions) {

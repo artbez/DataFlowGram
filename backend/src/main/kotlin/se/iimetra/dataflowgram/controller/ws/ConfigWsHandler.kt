@@ -12,7 +12,8 @@ import java.util.concurrent.CopyOnWriteArrayList
 
 class ConfigWsHandler {
   @Volatile
-  private var currentConfig: GitContent = GitContent(-1, SpaceContent(emptyList()), SpaceContent(emptyList()))
+  private var currentConfig: GitContent
+      = GitContent(-1, SpaceContent(emptyList()), SpaceContent(emptyList()), SpaceContent(emptyList()))
 
   private val sessions = CopyOnWriteArrayList<WebSocketSession>()
 

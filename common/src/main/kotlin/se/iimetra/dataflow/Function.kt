@@ -29,8 +29,13 @@ data class SystemFunction(val functionSignature: FunctionSignature, val name: St
 fun FunctionDescription.fullId() = "${meta.language}__${view.id.category}__${view.id.file}__${view.id.name}"
 
 @Serializable
-data class GitContent(val version: Long, val serverSpace: SpaceContent, val clientSpace: SpaceContent) {
-  fun allFunctions() = serverSpace.functions + clientSpace.functions
+data class GitContent(
+  val version: Long,
+  val pureSpace: SpaceContent,
+  val renderSpace: SpaceContent,
+  val resourceSpace: SpaceContent
+) {
+  fun allFunctions() = pureSpace.functions + renderSpace.functions + resourceSpace.functions
 }
 
 @Serializable

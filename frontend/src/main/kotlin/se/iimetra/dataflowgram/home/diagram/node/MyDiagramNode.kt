@@ -13,7 +13,9 @@ import se.iimetra.dataflowgram.wrappers.react.diagrams.AbstractNodeFactory
 import se.iimetra.dataflowgram.wrappers.react.diagrams.DiagramEngine
 import se.iimetra.dataflowgram.wrappers.react.diagrams.models.NodeModel
 
-class InitDefaultNode(val function: FunctionDescription) : NodeModel("default", "") {
+var nodeId = 0
+
+class InitDefaultNode(val function: FunctionDescription) : NodeModel("default", nodeId++.toString()) {
 
   val portsList = mutableListOf<InitialPortModel>()
   var outPort: InitialPortModel? = null

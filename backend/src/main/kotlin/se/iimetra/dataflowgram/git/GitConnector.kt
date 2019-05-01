@@ -15,6 +15,8 @@ class GitConnector(remoteRepo: String) {
   private val git: Git
   private val pureParser = PythonFileParser("pure")
   private val renderParser = PythonFileParser("render")
+  private val resourceParser = PythonFileParser("resource")
+
   private val version = AtomicLong(0)
 
   init {
@@ -33,17 +35,22 @@ class GitConnector(remoteRepo: String) {
       version.incrementAndGet()
     }
     if (reqVersion < version.get()) {
-      return GitContent(version.get(), lastVersion(true), lastVersion(false))
+      return GitContent(
+        version.get(),
+        lastVersion("repo/pure", pureParser),
+        lastVersion("repo/render", renderParser),
+        lastVersion("repo/resource", resourceParser)
+      )
     }
     return null
   }
 
-  private fun lastVersion(isPython: Boolean): SpaceContent {
-    val dir = if (isPython) Paths.get("repo/pure") else Paths.get("repo/render")
+  private fun lastVersion(repo: String, parser: AbstractParser): SpaceContent {
+    val dir = Paths.get(repo)
 
     val categories = Files.list(dir)
       .filter { Files.isDirectory(it) && !it.fileName.toString().startsWith(".") && !it.fileName.toString().contains("node modules") }
-      .map { directory -> processCategory(directory, isPython) }
+      .map { directory -> processCategory(directory, parser) }
       .toList()
 
     return SpaceContent(categories.flatMap { category ->
@@ -58,22 +65,20 @@ class GitConnector(remoteRepo: String) {
     })
   }
 
-  private fun processCategory(path: Path, isPure: Boolean): CategoryContent {
+  private fun processCategory(path: Path, parser: AbstractParser): CategoryContent {
     val data = Files.list(path).toList()
       .filter { Files.isRegularFile(it) }
-      .mapNotNull { leaf -> processFile(leaf, isPure)?.let { FileContent(leaf.shortFileName(), it) } }
+      .mapNotNull { leaf -> processFile(leaf, parser)?.let { FileContent(leaf.shortFileName(), it) } }
       .toList()
     return CategoryContent(path.fileName.toString(), data)
   }
 
-  private fun processFile(path: Path, isPure: Boolean): List<CustomFunction>? {
+  private fun processFile(path: Path, parser: AbstractParser): List<CustomFunction>? {
     val lines = Files.readAllLines(path)
     return when {
       lines.size == 0 -> null
-      isPure && !pureParser.check(lines[0]) -> null
-      !isPure && !renderParser.check(lines[0]) -> null
-      isPure -> pureParser.parse(version.get(), lines)
-      else -> renderParser.parse(version.get(), lines)
+      !parser.check(lines[0]) -> null
+      else -> parser.parse(version.get(), lines)
     }
   }
 
