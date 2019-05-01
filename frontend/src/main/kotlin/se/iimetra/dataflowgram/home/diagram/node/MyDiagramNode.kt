@@ -85,7 +85,7 @@ class DefaultNodeFactory : AbstractNodeFactory<InitDefaultNode>("default") {
   }
 
   override fun getNewInstance(initialConfig: FunctionDescription): InitDefaultNode {
-    return InitDefaultNode(initialConfig)
+    return InitDefaultNode(initialConfig.copy(paramValues = mutableMapOf()))
   }
 
   override fun generateReactWidget(diagramEngine: DiagramEngine, node: InitDefaultNode): ReactElement = buildElement {

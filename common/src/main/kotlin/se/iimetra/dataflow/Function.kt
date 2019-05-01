@@ -19,7 +19,8 @@ data class FunctionTextView(val id: FunctionId, val args: String, val content: L
 @Serializable
 data class FunctionDescription(
   val meta: FunctionMeta,
-  val view: FunctionTextView
+  val view: FunctionTextView,
+  val paramValues: MutableMap<String, String> = mutableMapOf()
 )
 
 @Serializable

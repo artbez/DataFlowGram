@@ -19,7 +19,7 @@ class ServerEventWsHandler(val dispatcher: RootDispatcher) {
   @UseExperimental(ImplicitReflectionSerializer::class)
   fun processServerRequest(session: WebSocketSession, content: String) = GlobalScope.future {
     val objContent = Json.plain.parse<ServerEventRequest>(content)
-    dispatcher.execute(objContent.functionId, objContent.arguments, objContent.version, emptyMap()) {
+    dispatcher.execute(objContent.functionId, objContent.arguments, objContent.version, objContent.paramValues) {
       val serverResult = ServerResultEventResponse(objContent.executionPanelId, objContent.blockIndex, it, null, null)
       val response = WsResponse("server", Json.stringify(serverResult))
       session.send(Mono.just(session.textMessage(Json.stringify(response)))).block()

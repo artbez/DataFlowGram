@@ -30,6 +30,7 @@ data class ConverterEventResponse(
 data class ServerEventRequest(
   val functionId: FunctionId,
   val arguments: List<String>,
+  val paramValues: MutableMap<String, String>,
   val version: Long,
   val executionPanelId: Long,
   val blockIndex: Int

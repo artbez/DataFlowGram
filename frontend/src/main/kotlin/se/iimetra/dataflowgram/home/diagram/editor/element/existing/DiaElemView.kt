@@ -1,7 +1,10 @@
 package se.iimetra.dataflowgram.home.diagram.editor.element.existing
 
 import kotlinx.html.InputType
+import kotlinx.html.js.onChangeFunction
 import kotlinx.html.js.onClickFunction
+import kotlinx.html.js.onInputFunction
+import kotlinx.html.js.onVolumeChangeFunction
 import react.*
 import react.dom.*
 import se.iimetra.dataflow.FunctionDescription
@@ -13,13 +16,21 @@ import se.iimetra.dataflowgram.wrappers.react.bootstrap.Popover
 import se.iimetra.dataflowgram.wrappers.react.diagrams.DiagramEngine
 import se.iimetra.dataflowgram.wrappers.react.diagrams.models.NodeModel
 
-class DiaElemView : RComponent<DiaElemView.Props, RState>() {
+class DiaElemView(props: Props) : RComponent<DiaElemView.Props, DiaElemView.State>(props) {
 
   interface Props : RProps {
     var function: FunctionDescription
     var selectedNode: NodeModel
     var engine: DiagramEngine
     var updateDiagram: () -> Unit
+  }
+
+  interface State : RState {
+    var paramValues: MutableMap<String, String>
+  }
+
+  override fun State.init(props: Props) {
+    paramValues = props.function.paramValues
   }
 
   override fun RBuilder.render() {
@@ -57,6 +68,14 @@ class DiaElemView : RComponent<DiaElemView.Props, RState>() {
                       "string" -> InputType.text
                       "int", "float" -> InputType.number
                       else -> TODO()
+                    }
+                    value = props.function.paramValues[param.key] ?: if (param.value == "string") "" else "0"
+                    onInputFunction = {
+                      val newValue = it.target.asDynamic().value
+                      print(newValue)
+                      setState {
+                        paramValues[param.key] = newValue
+                      }
                     }
                   }
                 }

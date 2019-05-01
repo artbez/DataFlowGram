@@ -59,7 +59,7 @@ class EventController {
   }
 
   fun pushServerEvent(function: FunctionDescription, args: List<String>, executionPanelId: Long, blockIndex: Int) {
-    val serverEvent = ServerEventRequest(function.view.id, args, function.meta.version, executionPanelId, blockIndex)
+    val serverEvent = ServerEventRequest(function.view.id, args, function.paramValues, function.meta.version, executionPanelId, blockIndex)
     val request = WsRequest("server", Json.stringify(serverEvent))
     clientWebSocket.send(Json.stringify(request))
   }
