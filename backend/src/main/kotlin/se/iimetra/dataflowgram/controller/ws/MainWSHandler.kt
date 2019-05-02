@@ -13,7 +13,8 @@ import se.iimetra.dataflow.WsRequest
 class MainWSHandler(
   private val configWsHandler: ConfigWsHandler,
   private val serverEventWsHandler: ServerEventWsHandler,
-  private val converterWsHandler: ConverterWsHandler
+  private val converterWsHandler: ConverterWsHandler,
+  private val userFilesSystemHandler: FilesSystemHandler
 ) : WebSocketHandler {
 
   private val logger = LoggerFactory.getLogger(MainWSHandler::class.java)
@@ -33,6 +34,7 @@ class MainWSHandler(
           "config" -> configWsHandler.processConfigRequest(session)
           "server" -> serverEventWsHandler.processServerRequest(session, request.content)
           "converter" -> converterWsHandler.processConverterRequest(session, request.content)
+          "files" -> userFilesSystemHandler.processFilesRequest(session)
           else -> throw Exception()
         }.thenAccept {
           session.send(Mono.just(session.textMessage(Json.stringify(it)))).block()

@@ -4,12 +4,17 @@ import org.slf4j.LoggerFactory
 import org.springframework.core.io.ClassPathResource
 import se.iimetra.dataflow.FunctionDescription
 import se.iimetra.dataflow.FunctionId
+import se.iimetra.dataflowgram.files.FileSystemConnector
 import se.iimetra.dataflowgram.git.GitConnector
 import se.iimetra.dataflowgram.root.FunctionsCache
 import se.iimetra.dataflowgram.worker.PythonServerClient
 import se.iimetra.dataflowgram.worker.WorkerAction
 
-class UpdateHandler(private val gitConnector: GitConnector, private val client: PythonServerClient) {
+class UpdateHandler(
+  private val gitConnector: GitConnector,
+  private val fileSystemConnector: FileSystemConnector,
+  private val client: PythonServerClient
+) {
 
   private val cache = FunctionsCache()
   private val logger = LoggerFactory.getLogger(UpdateHandler::class.java)
@@ -33,7 +38,7 @@ class UpdateHandler(private val gitConnector: GitConnector, private val client: 
     val fileOut = ClassPathResource("public/imgs").file
 
     try {
-      client.update(repo, fileOut.absolutePath.toString(), files)
+      client.update(repo, fileOut.absolutePath.toString(), fileSystemConnector.userDir.toAbsolutePath().toString(), files)
       cache.update(gitContent.version, updated)
       action.result.complete(gitContent)
     } catch (ex: Exception) {

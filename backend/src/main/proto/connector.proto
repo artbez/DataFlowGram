@@ -6,7 +6,8 @@ option java_package = "se.iimetra.dataflowgram.worker";
 message Update {
     string repo = 1;
     string fileOut = 2;
-    repeated FileLocation locations = 3;
+    string userDir = 3;
+    repeated FileLocation locations = 4;
 }
 
 message FileLocation {

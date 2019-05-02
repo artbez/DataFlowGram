@@ -9,6 +9,7 @@ import se.iimetra.dataflow.*
 import se.iimetra.dataflowgram.home.configController
 import se.iimetra.dataflowgram.home.converterController
 import se.iimetra.dataflowgram.home.diagram.editor.panel.DiagramExecutionPanel
+import se.iimetra.dataflowgram.home.filesSystemController
 import se.iimetra.dataflowgram.home.serverEventController
 import kotlin.browser.window
 
@@ -19,9 +20,8 @@ class EventController {
 
   init {
     clientWebSocket.onopen = {
-      val rr = WsRequest("config", "")
-      console.log(rr)
-      clientWebSocket.send(Json.plain.stringify(rr))
+      clientWebSocket.send(Json.plain.stringify(WsRequest("config", "")))
+      clientWebSocket.send(Json.plain.stringify(WsRequest("files", "")))
     }
     clientWebSocket.onerror = {
       window.alert(it.asDynamic().data)
@@ -52,6 +52,11 @@ class EventController {
         "converter" -> {
           val ans = Json.plain.parse<ConverterEventResponse>(answer.content)
           converterController.push(ans)
+        }
+
+        "files" -> {
+          val ans = Json.plain.parse<UserFilesInfo>(answer.content)
+          filesSystemController.push(ans)
         }
         else -> TODO()
       }

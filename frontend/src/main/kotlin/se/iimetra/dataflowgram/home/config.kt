@@ -26,10 +26,11 @@ fun DiagramEngine.setup(): DiagramEngine {
 }
 
 val paletteSystemChoseController = PaletteSystemChoseController()
-val clientEventController = ClientEventController()
+val filesSystemController = FilesSystemController()
 val serverEventController = ServerEventController()
 val configController = ConfigController()
 val paletteDefaultChoseController = PaletteDefaultChoseController()
+val paletteFileChoseController = PaletteFileChoseController()
 val executionService = ExecutionService()
 @ImplicitReflectionSerializer
 val eventController = EventController()

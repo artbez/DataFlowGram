@@ -10,6 +10,7 @@ import se.iimetra.dataflow.SystemFunction
 import se.iimetra.dataflowgram.home.diagram.SceneTransferObject
 import se.iimetra.dataflowgram.home.diagram.editor.element.existing.diaElemView
 import se.iimetra.dataflowgram.home.diagram.editor.element.existing.systemDiaElemView
+import se.iimetra.dataflowgram.home.diagram.editor.element.new.fileView
 import se.iimetra.dataflowgram.home.diagram.editor.element.new.functionDescriptionView
 import se.iimetra.dataflowgram.home.diagram.editor.element.new.systemDescriptionView
 import se.iimetra.dataflowgram.home.diagram.editor.panel.DiagramExecutionPanel
@@ -18,6 +19,7 @@ import se.iimetra.dataflowgram.home.diagram.node.ConverterNode
 import se.iimetra.dataflowgram.home.diagram.node.InitDefaultNode
 import se.iimetra.dataflowgram.home.executionService
 import se.iimetra.dataflowgram.home.paletteDefaultChoseController
+import se.iimetra.dataflowgram.home.paletteFileChoseController
 import se.iimetra.dataflowgram.home.paletteSystemChoseController
 import se.iimetra.dataflowgram.utils.toMap
 import se.iimetra.dataflowgram.wrappers.react.diagrams.DiagramEngine
@@ -54,6 +56,7 @@ class Editor : RComponent<Editor.Props, Editor.State>() {
     defaultPaletteChosen = null
     selectedNode = null
     systemPaletteChosen = null
+    filePaletteChosen = null
   }
 
   override fun componentDidMount() {
@@ -63,6 +66,7 @@ class Editor : RComponent<Editor.Props, Editor.State>() {
         selectedNode = null
         systemPaletteChosen = null
         defaultPaletteChosen = it
+        filePaletteChosen = null
       }
     }
     paletteSystemChoseController.addListener {
@@ -71,6 +75,16 @@ class Editor : RComponent<Editor.Props, Editor.State>() {
         selectedNode = null
         systemPaletteChosen = it
         defaultPaletteChosen = null
+        filePaletteChosen = null
+      }
+    }
+    paletteFileChoseController.addListener {
+      setState {
+        executionPanel = null
+        selectedNode = null
+        systemPaletteChosen = null
+        defaultPaletteChosen = null
+        filePaletteChosen = it
       }
     }
   }
@@ -80,6 +94,7 @@ class Editor : RComponent<Editor.Props, Editor.State>() {
     var systemPaletteChosen: SystemFunction?
     var selectedNode: NodeModel?
     var executionPanel: DiagramExecutionPanel?
+    var filePaletteChosen: String?
   }
 
   override fun RBuilder.render() {
@@ -107,6 +122,12 @@ class Editor : RComponent<Editor.Props, Editor.State>() {
           attrs {
             updateDiagram = props.updateDiagram
             diagramExecutionPanel = state.executionPanel!!
+          }
+        }
+      } else if (state.filePaletteChosen != null) {
+        fileView {
+          attrs {
+            filename = state.filePaletteChosen!!
           }
         }
       } else if (state.selectedNode != null) {

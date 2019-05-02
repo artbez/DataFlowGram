@@ -7,12 +7,11 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.stringify
 import react.*
 import react.dom.div
-import se.iimetra.dataflow.FunctionDescription
-import se.iimetra.dataflow.SystemFunction
-import se.iimetra.dataflow.fullId
-import se.iimetra.dataflow.toMathText
+import se.iimetra.dataflow.*
 import se.iimetra.dataflowgram.home.configController
 import se.iimetra.dataflowgram.home.diagram.palette.blocks.categoryBlock
+import se.iimetra.dataflowgram.home.diagram.palette.blocks.filesBlock
+import se.iimetra.dataflowgram.home.filesSystemController
 import se.iimetra.dataflowgram.home.paletteSystemChoseController
 import se.iimetra.dataflowgram.wrappers.react.devextreme.TreeView
 import se.iimetra.dataflowgram.wrappers.react.tabs.Tab
@@ -26,6 +25,7 @@ class Palette : RComponent<RProps, Palette.State>() {
     pureCategories = emptyList()
     renderCategories = emptyList()
     resourceCategories = emptyList()
+    files = emptyList()
   }
 
   override fun componentDidMount() {
@@ -34,6 +34,14 @@ class Palette : RComponent<RProps, Palette.State>() {
         pureCategories = toViewCategories(newConfig.git.pureSpace.functions)
         renderCategories = toViewCategories(newConfig.git.renderSpace.functions)
         resourceCategories = toViewCategories(newConfig.git.resourceSpace.functions)
+      }
+    }
+    filesSystemController.addListener { newFiles ->
+      val viewFiles = toViewFiles(newFiles)
+      if (state.files != viewFiles) {
+        setState {
+          files = viewFiles
+        }
       }
     }
   }
@@ -57,6 +65,9 @@ class Palette : RComponent<RProps, Palette.State>() {
           }
           Tab {
             +"Resource"
+          }
+          Tab {
+            +"File System"
           }
         }
         TabPanel {
@@ -95,22 +106,14 @@ class Palette : RComponent<RProps, Palette.State>() {
             }
           }
         }
-//        TabPanel {
-//          if (state.converters.isNotEmpty()) {
-//            TreeView {
-//              attrs {
-//                id = "converters"
-//                items = kotlin.js.JSON.parse(Json.plain.stringify(state.converters))
-//                searchEnabled = false
-//                onItemClick = {
-//                  if (it.itemData.items == null) {
-//                    paletteSystemChoseController.newChoose(it.itemData.id as String)
-//                  }
-//                }
-//              }
-//            }
-//          }
-//        }
+        TabPanel {
+          filesBlock {
+            attrs {
+              name = "All files in file system"
+              content = state.files
+            }
+          }
+        }
       }
     }
   }
@@ -119,7 +122,7 @@ class Palette : RComponent<RProps, Palette.State>() {
     var pureCategories: List<ViewCategory>
     var renderCategories: List<ViewCategory>
     var resourceCategories: List<ViewCategory>
-    var converters: List<ViewCell>
+    var files: List<ViewCell>
   }
 
   private fun systemToViewCells(functions: List<SystemFunction>): List<ViewCell> =
@@ -132,6 +135,10 @@ class Palette : RComponent<RProps, Palette.State>() {
         items = items
       )
     }
+
+  private fun toViewFiles(filesInfo: UserFilesInfo): List<ViewCell> {
+    return filesInfo.files.map { ViewCell(it.filename, it.filename, false) }
+  }
 
 
   private fun toViewCategories(functions: List<FunctionDescription>): List<ViewCategory> {

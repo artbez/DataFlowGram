@@ -66,7 +66,13 @@ class ExecutionService(connector_pb2_grpc.ExecutorServicer):
 
         if request.language == 'render':
             out_file = 'f' + str(next_id) + ExecutionService.__type_to_extension(request.targetType)
-            params['fileOut'] = global_vars['fileOut'] + '/' + out_file
+            params['file'] = global_vars['fileOut'] + '/' + out_file
+
+        if request.language == 'resource':
+            if 'file_in' in params.keys():
+                params['file_in'] = global_vars['userDir'] + '/' + params['file_in']
+            if 'file_out' in params.keys():
+                params['file_out'] = global_vars['userDir'] + '/' + params['file_out']
 
         q = queue.Queue()
         log = Logger(q)
@@ -100,7 +106,7 @@ class ExecutionService(connector_pb2_grpc.ExecutorServicer):
             yield connector_pb2.ExecutionResult(msg=elem)
 
         if request.language == 'render':
-            yield connector_pb2.ExecutionResult(ref=res)
+            yield connector_pb2.ExecutionResult(ref=out_file)
         else:
             next_name = 'i' + str(next_id)
             next_id = next_id + 1
@@ -111,11 +117,12 @@ class ExecutionService(connector_pb2_grpc.ExecutorServicer):
     def UpdateLib(self, request, context):
         sys.path.append(request.repo)
         global_vars['fileOut'] = request.fileOut
+        global_vars['userDir'] = request.userDir
 
         for location in request.locations:
             new_path = request.repo + '/' + location.language + '/' + location.category
             if new_path not in sys.path:
-                sys.path.append(request.repo + '/' + location.language + '/' + location.category)
+                sys.path.insert(0, request.repo + '/' + location.language + '/' + location.category)
             module = __import__(location.file)
             reload(module)
             globals()[self.__getLocation(location.category, location.file, location.language)] = module
@@ -155,9 +162,7 @@ class ExecutionService(connector_pb2_grpc.ExecutorServicer):
 
     @staticmethod
     def __type_to_extension(type):
-        if type == "PNG":
-            return ".png"
-        return ".jpeg"
+        return "." + type
 
 
 class Logger(object):

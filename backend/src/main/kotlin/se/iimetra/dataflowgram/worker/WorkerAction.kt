@@ -1,9 +1,6 @@
 package se.iimetra.dataflowgram.worker
 
-import se.iimetra.dataflow.FunctionDescription
-import se.iimetra.dataflow.FunctionId
-import se.iimetra.dataflow.FunctionSignature
-import se.iimetra.dataflow.GitContent
+import se.iimetra.dataflow.*
 import se.iimetra.dataflowgram.root.ValueTypePair
 import java.nio.file.Path
 import java.util.concurrent.CompletableFuture
@@ -47,4 +44,8 @@ sealed class WorkerAction {
     val onMessageReceive: (String) -> Unit = {},
     override val result: CompletableFuture<String>
   ): CompletableAction<String>, WorkerAction()
+
+//  data class AllFiles(
+//    override val result: CompletableFuture<UserFilesInfo?>
+//  ): CompletableAction<UserFilesInfo?>, WorkerAction()
 }

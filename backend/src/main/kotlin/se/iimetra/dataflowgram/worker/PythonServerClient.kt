@@ -27,10 +27,11 @@ class PythonServerClient internal constructor(private val channel: ManagedChanne
     channel.shutdown().awaitTermination(5, TimeUnit.SECONDS)
   }
 
-  fun update(repo: String, fileOut: String, locations: List<UpdateLocation>) {
+  fun update(repo: String, fileOut: String, userDir: String, locations: List<UpdateLocation>) {
     val requestBuilder = Connector.Update.newBuilder()
     requestBuilder.repo = repo
     requestBuilder.fileOut = fileOut
+    requestBuilder.userDir = userDir
     requestBuilder.addAllLocations(locations.map {
       Connector.FileLocation.newBuilder()
         .setCategory(it.category)

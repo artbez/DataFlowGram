@@ -7,6 +7,8 @@ import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
 import se.iimetra.dataflow.FunctionId
 import se.iimetra.dataflow.GitContent
+import se.iimetra.dataflow.UserFilesInfo
+import se.iimetra.dataflowgram.files.FileSystemConnector
 import se.iimetra.dataflowgram.git.GitConnector
 import se.iimetra.dataflowgram.root.ValueTypePair
 import se.iimetra.dataflowgram.worker.handlers.ConvertersHandler
@@ -17,7 +19,7 @@ import java.nio.file.Path
 import java.util.concurrent.CompletableFuture
 
 
-class Worker(private val gitConnector: GitConnector) {
+class Worker(private val gitConnector: GitConnector, private val filesSystemConnector: FileSystemConnector) {
   private val actionQueue = Channel<WorkerAction>()
   private val logger = LoggerFactory.getLogger(Worker::class.java)
 
@@ -98,6 +100,12 @@ class Worker(private val gitConnector: GitConnector) {
     return future
   }
 
+//  suspend fun allFiles(): CompletableFuture<UserFilesInfo?> {
+//    val future = CompletableFuture<UserFilesInfo?>()
+//    actionQueue.send(WorkerAction.AllFiles(future))
+//    return future
+//  }
+
   suspend fun execute(function: FunctionId, args: List<String>, params: Map<String, String>, version: Long, onMessageReceive: (String) -> Unit): CompletableFuture<String> {
     val future = CompletableFuture<String>()
     actionQueue.send(WorkerAction.Execute(function, args, params, version, onMessageReceive, future))
@@ -129,7 +137,7 @@ class Worker(private val gitConnector: GitConnector) {
   }
 
   private fun initHandlers() {
-    updateHandler = UpdateHandler(gitConnector, client)
+    updateHandler = UpdateHandler(gitConnector, filesSystemConnector, client)
     executionHandler = ExecutionHandler(client)
     convertersHandler = ConvertersHandler(client)
     fileActionsHandler = FileActionsHandler(client)

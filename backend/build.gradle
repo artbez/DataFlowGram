@@ -61,7 +61,7 @@ idea {
 
 dependencies {
     compile "org.jetbrains.kotlinx:kotlinx-serialization-runtime:$serialization_version"
-
+    //compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: "$spring_boot_version"
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-webflux', version: "$spring_boot_version"
     compile group: 'com.fasterxml.jackson.module', name: 'jackson-module-kotlin', version: '2.9.8'
 
@@ -71,6 +71,13 @@ dependencies {
 
     compile('com.google.protobuf:protobuf-java:3.6.1')
     compile('com.google.protobuf:protobuf-java-util:3.6.1')
+
+    //compile group: 'javax.servlet', name: 'javax.servlet-api', version: '4.0.1'
+    // https://mvnrepository.com/artifact/commons-fileupload/commons-fileupload
+    compile group: 'commons-fileupload', name: 'commons-fileupload', version: '1.4'
+
+// https://mvnrepository.com/artifact/org.springframework/spring-webmvc
+  //  compile group: 'org.springframework', name: 'spring-webmvc', version: '5.1.6.RELEASE'
 
     // https://mvnrepository.com/artifact/net.sf.py4j/py4j
     compile group: 'net.sf.py4j', name: 'py4j', version: '0.10.8.1'

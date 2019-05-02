@@ -10,7 +10,7 @@ import kotlin.js.json
 private const val POST = "POST"
 private const val GET = "GET"
 
-suspend fun get(url: String, body: dynamic = null, headers: dynamic): String {
+suspend fun get(url: String, body: dynamic = null, headers: dynamic = defaultHeaders): String {
   val response = request(GET, url, body, headers)
   if (!response.ok) {
     window.alert(response.text().await())
@@ -20,8 +20,8 @@ suspend fun get(url: String, body: dynamic = null, headers: dynamic): String {
   }
 }
 
-suspend fun post(url: String, body: dynamic = null): String {
-  val response = request(POST, url, body)
+suspend fun post(url: String, body: dynamic = null, headers: dynamic): String {
+  val response = request(POST, url, body, headers)
   if (!response.ok) {
     window.alert(response.text().await())
     throw RuntimeException("Exception when post")
@@ -30,8 +30,11 @@ suspend fun post(url: String, body: dynamic = null): String {
   }
 }
 
-private suspend fun request(method: String, url: String, body: dynamic, headers: dynamic = defaultHeaders): Response =
+suspend fun request(method: String, url: String, body: dynamic, headers: dynamic = defaultHeaders): Response =
   window.fetch(url, object : RequestInit {
+    var processData: Boolean? = false
+    var data = body
+    var contentType = false
     override var method: String? = method
     override var body: dynamic = body
     override var credentials: RequestCredentials? = "same-origin".asDynamic()
@@ -41,4 +44,11 @@ private suspend fun request(method: String, url: String, body: dynamic, headers:
 private val defaultHeaders = json(
   "Accept" to "application/json",
   "Content-Type" to "application/json;charset=UTF-8"
+)
+
+val fileHeaders = json(
+  // "Accept" to "multipart/form-data",
+  "enctype" to "multipart/form-data",
+  "processData" to false,
+  "contentType" to false
 )
