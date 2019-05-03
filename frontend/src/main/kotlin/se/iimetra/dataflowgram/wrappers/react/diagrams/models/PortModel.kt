@@ -5,11 +5,12 @@ package se.iimetra.dataflowgram.wrappers.react.diagrams.models
 import se.iimetra.dataflowgram.home.diagram.node.ports.InitialPortModel
 import se.iimetra.dataflowgram.utils.JsMap
 import se.iimetra.dataflowgram.wrappers.react.diagrams.BaseModelListener
+import se.iimetra.dataflowgram.wrappers.react.diagrams.DiagramEngine
 import se.iimetra.dataflowgram.wrappers.react.diagrams.LinkModelListener
 
 @JsName("PortModel")
 open external class PortModel(
-    name: String,
+    name: String = definedExternally,
     type: String = definedExternally,
     id: String = definedExternally,
     maximumLinks: Int = definedExternally
@@ -18,6 +19,8 @@ open external class PortModel(
     fun getNode(): NodeModel
     fun getName(): String
     fun getMaximumLinks(): Int
+    open fun serialize(): dynamic
+    open fun deSerialize(ob: dynamic, engine: DiagramEngine)
     fun setMaximumLinks(maximumLinks: Int)
     fun removeLink(link: LinkModel<LinkModelListener>)
     fun addLink(link: LinkModel<LinkModelListener>)

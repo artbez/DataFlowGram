@@ -10,6 +10,9 @@ buildscript {
 
     repositories {
         mavenCentral()
+        maven { url "http://dl.bintray.com/kotlin/kotlin-dev" }
+        maven { url "https://kotlin.bintray.com/kotlinx" }
+        maven { url  "http://dl.bintray.com/kotlin/kotlinx.html/" }
     }
 }
 
@@ -29,8 +32,13 @@ version '1.0-SNAPSHOT'
 
 sourceCompatibility = 1.8
 
+ext {
+    kotlinx_html_version = 'latest-1.2.30-dev-132-242'
+}
+
 repositories {
     mavenCentral()
+    maven { url 'https://dl.bintray.com/kotlin/kotlin-dev/' }
 }
 
 protobuf {
@@ -64,6 +72,10 @@ dependencies {
     //compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: "$spring_boot_version"
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-webflux', version: "$spring_boot_version"
     compile group: 'com.fasterxml.jackson.module', name: 'jackson-module-kotlin', version: '2.9.8'
+// https://mvnrepository.com/artifact/org.jetbrains.kotlinx/kotlinx.html.jvm
+// https://mvnrepository.com/artifact/org.jetbrains.kotlinx/kotlinx.html.jvm
+// https://mvnrepository.com/artifact/org.jetbrains.kotlinx/kotlinx-html-jvm
+    compile group: 'org.jetbrains.kotlinx', name: 'kotlinx-html-jvm', version: 'latest-1.3.40-dev-2406-1959'
 
     compile 'io.grpc:grpc-netty-shaded:1.19.0'
     compile 'io.grpc:grpc-protobuf:1.19.0'

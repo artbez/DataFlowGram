@@ -10,7 +10,7 @@ abstract external class AbstractFactory<out T : BaseModel<dynamic, dynamic>>(nam
 
     fun getType(): String
 
-    abstract fun getNewInstance(initialConfig: dynamic): T
+    abstract fun getNewInstance(): T
 }
 
 @JsName("AbstractNodeFactory")
@@ -29,4 +29,4 @@ abstract external class AbstractLabelFactory<T : LabelModel> : AbstractFactory<T
 }
 
 @JsName("AbstractPortFactory")
-abstract external class AbstractPortFactory<out T : PortModel> : AbstractFactory<T>
+abstract external class AbstractPortFactory<out T : PortModel>(name: String) : AbstractFactory<T>

@@ -1,26 +1,45 @@
 package se.iimetra.dataflowgram.home.diagram.node
 
 import kotlinext.js.invoke
+import kotlinext.js.jsObject
+import kotlinx.serialization.ImplicitReflectionSerializer
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.parse
+import kotlinx.serialization.stringify
 import react.*
 import react.dom.div
 import react.dom.span
 import se.iimetra.dataflow.FunctionDescription
-import se.iimetra.dataflowgram.home.diagram.node.ports.InitialPortModel
-import se.iimetra.dataflowgram.home.diagram.node.ports.PortPosition
-import se.iimetra.dataflowgram.home.diagram.node.ports.PortType
-import se.iimetra.dataflowgram.home.diagram.node.ports.portModelWidget
+import se.iimetra.dataflowgram.home.diagram.node.ports.*
+import se.iimetra.dataflowgram.home.inPorts
+import se.iimetra.dataflowgram.home.outPorts
+import se.iimetra.dataflowgram.utils.JsMap
+import se.iimetra.dataflowgram.wrappers.lodash.lodash
 import se.iimetra.dataflowgram.wrappers.react.diagrams.AbstractNodeFactory
 import se.iimetra.dataflowgram.wrappers.react.diagrams.DiagramEngine
 import se.iimetra.dataflowgram.wrappers.react.diagrams.models.NodeModel
-
+import kotlin.js.JSON as KJSON
 var nodeId = 0
 
-class InitDefaultNode(val function: FunctionDescription) : NodeModel("default", nodeId++.toString()) {
+class InitDefaultNode constructor() : NodeModel("default") {
 
+  constructor(function: FunctionDescription): this() {
+    initAll(function.copy(paramValues = mutableMapOf()))
+  }
+
+  lateinit var function: FunctionDescription
   val portsList = mutableListOf<InitialPortModel>()
   var outPort: InitialPortModel? = null
 
-  init {
+  fun simpleInit(func: FunctionDescription): InitDefaultNode {
+    function = func
+    inPorts().forEach { portsList.add(it) }
+    outPort = outPorts().let { if (it.isEmpty()) null else it[0]}
+    return this
+  }
+
+  fun initAll(func: FunctionDescription): InitDefaultNode {
+    function = func
     function.meta.signature.input.filter { it.isNotBlank() }.forEachIndexed { index, s ->
       val model = InitialPortModel(s, PortType.In, index)
       portsList.add(model)
@@ -30,6 +49,25 @@ class InitDefaultNode(val function: FunctionDescription) : NodeModel("default", 
       outPort = InitialPortModel(function.meta.signature.output, PortType.Out, -1)
       addPort(outPort!!)
     }
+    return this
+  }
+
+  @UseExperimental(ImplicitReflectionSerializer::class)
+  override fun serialize(): dynamic {
+    val map = kotlin.js.JSON.parse<JsMap<dynamic>>(kotlin.js.JSON.stringify(super.serialize()))
+    val obj = jsObject<dynamic> {
+      this.mfunction = KJSON.parse<JsMap<dynamic>>(Json.stringify(function))
+    }
+    val jsParams = kotlin.js.JSON.parse<JsMap<dynamic>>(kotlin.js.JSON.stringify(obj))
+    val res = lodash.merge(map, jsParams)
+    return res
+  }
+
+  @UseExperimental(ImplicitReflectionSerializer::class)
+  override fun deSerialize(ob: dynamic, engine: DiagramEngine) {
+    super.deSerialize(ob, engine)
+    val function = Json.plain.parse<FunctionDescription>(kotlin.js.JSON.stringify(ob.mfunction))
+    simpleInit(function)
   }
 }
 
@@ -86,8 +124,8 @@ class DefaultNodeFactory : AbstractNodeFactory<InitDefaultNode>("default") {
     val instance = DefaultNodeFactory()
   }
 
-  override fun getNewInstance(initialConfig: FunctionDescription): InitDefaultNode {
-    return InitDefaultNode(initialConfig.copy(paramValues = mutableMapOf()))
+  override fun getNewInstance(): InitDefaultNode {
+    return InitDefaultNode()
   }
 
   override fun generateReactWidget(diagramEngine: DiagramEngine, node: InitDefaultNode): ReactElement = buildElement {

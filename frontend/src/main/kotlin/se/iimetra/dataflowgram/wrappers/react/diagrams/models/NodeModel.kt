@@ -4,11 +4,14 @@ package se.iimetra.dataflowgram.wrappers.react.diagrams.models
 
 import se.iimetra.dataflowgram.utils.JsMap
 import se.iimetra.dataflowgram.wrappers.react.diagrams.BaseModelListener
+import se.iimetra.dataflowgram.wrappers.react.diagrams.DiagramEngine
 
 @JsName("NodeModel")
-open external class NodeModel(nodeType: String = definedExternally, id: String?) :
+open external class NodeModel(nodeType: String = definedExternally, id: String? = definedExternally) :
     BaseModel<DiagramModel, BaseModelListener> {
 
+    open fun serialize(): dynamic
+    open fun deSerialize(ob: dynamic, engine: DiagramEngine)
     fun setPosition(x: Double, y: Double)
     fun getPortFromID(id: String): PortModel?
     fun getPort(name: String): PortModel

@@ -1,18 +1,20 @@
 package se.iimetra.dataflowgram.controller
 
+import kotlinx.html.body
+import kotlinx.html.*
+import kotlinx.html.dom.createHTMLDocument
 import org.springframework.core.io.ByteArrayResource
 import org.springframework.core.io.Resource
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Controller
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestMethod
+import org.springframework.web.bind.annotation.RequestParam
 import se.iimetra.dataflowgram.files.FileSystemConnector
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Paths
-import jdk.nashorn.internal.codegen.OptimisticTypesPersistence.store
-import org.springframework.http.codec.multipart.FilePart
-import org.springframework.web.bind.annotation.*
-import org.springframework.web.multipart.MultipartFile
 
 
 @Controller
@@ -38,4 +40,17 @@ class FileController(val fileSystemConnector: FileSystemConnector) {
     fileSystemConnector.deleteFile(path)
     return ResponseEntity.ok(Unit)
   }
+
+//  @RequestMapping(path = ["/get"], method = [RequestMethod.GET])
+//  fun get(@RequestParam("fileName") fileName: String): ResponseEntity<Resource> {
+//    val path = Paths.get(fileSystemConnector.userDir.toAbsolutePath().toString() + "/" + fileName)
+//    val ext = path.toFile().extension
+//    val resource = ByteArrayResource(Files.readAllBytes(path))
+//
+//    return ResponseEntity.ok()
+//      //.headers(headers)
+//      .contentLength(htmlOut.toString().length.toLong())
+//      .contentType(MediaType.TEXT_HTML)
+//      .body(resource)
+//  }
 }

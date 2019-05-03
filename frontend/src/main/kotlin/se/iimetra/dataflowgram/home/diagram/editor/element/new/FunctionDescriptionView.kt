@@ -80,11 +80,11 @@ class FunctionDescriptionView : RComponent<FunctionDescriptionView.Props, RState
           attrs {
             label = props.function.view.id.name
             sceneTransfer = props.sceneTransferObject
-            this.nodeProducer = { DefaultNodeFactory.instance.getNewInstance(props.function) }
+            this.nodeProducer = { DefaultNodeFactory.instance.getNewInstance().initAll(props.function) }
           }
           defaultNodeWidget {
             attrs {
-              this.defaultNode = DefaultNodeFactory.instance.getNewInstance(props.function)
+              this.defaultNode = DefaultNodeFactory.instance.getNewInstance().initAll(props.function)
               isView = true
             }
           }

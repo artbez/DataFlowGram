@@ -32,7 +32,13 @@ class HomeComponent : RComponent<RProps, RState>() {
 
   override fun RBuilder.render() {
     console.log(loadable.lib)
-    header
+    header {
+      attrs {
+        diagramModel = engine.getDiagramModel()
+        diaEngine = engine
+        updateDiagram = { forceUpdate {} }
+      }
+    }
     div("row home-all") {
       div("col-md-2 container-scroll") {
         editor {

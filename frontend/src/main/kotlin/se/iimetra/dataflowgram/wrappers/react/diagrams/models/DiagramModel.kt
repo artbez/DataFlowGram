@@ -62,5 +62,7 @@ open external class DiagramModel : BaseEntity<DiagramListener> {
     fun removeNode(node: String)
     fun getLinks(): JsMap<LinkModel<LinkModelListener>>
     fun getNodes(): JsMap<NodeModel>
+    fun serializeDiagram(): dynamic
+    fun deSerializeDiagram(serialized: dynamic, engine: DiagramEngine)
 }
 

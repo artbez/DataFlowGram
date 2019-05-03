@@ -5,6 +5,7 @@ import se.iimetra.dataflowgram.home.controllers.*
 import se.iimetra.dataflowgram.home.diagram.executor.ExecutionService
 import se.iimetra.dataflowgram.home.diagram.node.ConverterNodeFactory
 import se.iimetra.dataflowgram.home.diagram.node.DefaultNodeFactory
+import se.iimetra.dataflowgram.home.diagram.node.ports.InitPortModelFactory
 import se.iimetra.dataflowgram.home.diagram.node.ports.InitialPortModel
 import se.iimetra.dataflowgram.home.diagram.node.ports.PortType
 import se.iimetra.dataflowgram.utils.toMap
@@ -19,6 +20,7 @@ fun DiagramEngine.setup(): DiagramEngine {
 
   registerNodeFactory(DefaultNodeFactory.instance)
   registerNodeFactory(ConverterNodeFactory.instance)
+  registerPortFactory(InitPortModelFactory.instance)
 
   val model = DiagramModel()
   setDiagramModel(model)
@@ -55,9 +57,9 @@ fun NodeModel.selectAllNodes(): List<NodeModel> {
   return nearNodes.plus(this).plus(nearNodes.flatMap { it.selectAllNodes() }).distinctBy { it.getID() }
 }
 
-fun NodeModel.inPorts() = getPorts().toMap().values.map { it as InitialPortModel }.filter { it.type == PortType.In }
+fun NodeModel.inPorts() = getPorts().toMap().values.map { it as InitialPortModel }.filter { it.portType == PortType.In }
 
-fun NodeModel.outPorts() = getPorts().toMap().values.map { it as InitialPortModel }.filter { it.type == PortType.Out }
+fun NodeModel.outPorts() = getPorts().toMap().values.map { it as InitialPortModel }.filter { it.portType == PortType.Out }
 
 fun NodeModel.outLinks() = outPorts().flatMap { it.getLinks().toMap().values }
 
@@ -65,12 +67,12 @@ fun LinkModel<*>.inPort(): InitialPortModel {
   val initialSource = getSourcePort() as InitialPortModel
   val initialTarget = getTargetPort() as InitialPortModel
 
-  return if (initialSource.type == PortType.In) initialSource else initialTarget
+  return if (initialSource.portType == PortType.In) initialSource else initialTarget
 }
 
 fun LinkModel<*>.outPort(): InitialPortModel {
   val initialSource = getSourcePort() as InitialPortModel
   val initialTarget = getTargetPort() as InitialPortModel
 
-  return if (initialSource.type == PortType.Out) initialSource else initialTarget
+  return if (initialSource.portType == PortType.Out) initialSource else initialTarget
 }

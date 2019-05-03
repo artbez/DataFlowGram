@@ -13,7 +13,6 @@ class ESComponent : RComponent<ESComponent.Props, RState>() {
   override fun RBuilder.render() {
     val signature = when (props.state.node) {
       is InitDefaultNode -> (props.state.node as InitDefaultNode).function.meta.signature
-      is ConverterNode -> (props.state.node as ConverterNode).function.functionSignature
       else -> throw IllegalStateException("Unsupported node type")
     }
     div("configurer-props") {
@@ -90,18 +89,11 @@ class ESComponent : RComponent<ESComponent.Props, RState>() {
       is InitDefaultNode ->
         defaultNodeWidget {
           attrs {
-            this.defaultNode = DefaultNodeFactory.instance.getNewInstance(nodeModel.function)
+            this.defaultNode = DefaultNodeFactory.instance.getNewInstance().initAll(nodeModel.function)
             isView = true
           }
         }
-      is ConverterNode -> {
-        converterNodeWidget {
-          attrs {
-            this.converterNode = ConverterNodeFactory.instance.getNewInstance(nodeModel.function)
-            isView = true
-          }
-        }
-      }
+      is ConverterNode -> { }
     }
   }
 }

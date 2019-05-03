@@ -24,22 +24,6 @@ class SystemDescriptionView : RComponent<SystemDescriptionView.Props, RState>() 
         b { +"Signature:" }
         span { +props.function.functionSignature.toMathText() }
       }
-      div("configurer-props__group") {
-        b { +"Drag to Scene:" }
-        editorNode {
-          attrs {
-            label = props.function.name
-            sceneTransfer = props.sceneTransferObject
-            this.nodeProducer = {  ConverterNodeFactory.instance.getNewInstance(props.function) }
-          }
-          converterNodeWidget {
-            attrs {
-              this.converterNode = ConverterNodeFactory.instance.getNewInstance(props.function)
-              isView = true
-            }
-          }
-        }
-      }
     }
   }
 }

@@ -16,10 +16,10 @@ import se.iimetra.dataflowgram.wrappers.react.diagrams.AbstractNodeFactory
 import se.iimetra.dataflowgram.wrappers.react.diagrams.DiagramEngine
 import se.iimetra.dataflowgram.wrappers.react.diagrams.models.NodeModel
 
-class ConverterNode(val function: SystemFunction) : NodeModel("system", "") {
+class ConverterNode : NodeModel("system", "") {
 
-  val inPort: InitialPortModel = InitialPortModel(function.functionSignature.input[0], PortType.In, 0)
-  val outPort: InitialPortModel = InitialPortModel(function.functionSignature.output, PortType.Out, -1)
+  val inPort: InitialPortModel = TODO()//InitialPortModel(function.functionSignature.input[0], PortType.In, 0)
+  val outPort: InitialPortModel = TODO()// InitialPortModel(function.functionSignature.output, PortType.Out, -1)
 
   init {
     addPort(inPort)
@@ -36,29 +36,29 @@ class ConverterNodeWidget : RComponent<ConverterNodeWidget.Props, RState>() {
   }
 
   override fun RBuilder.render() {
-    div {
-      if (props.converterNode.function.params["from"]!! == "server") {
-        converterUp("converter-icon_up") { }
-      } else {
-        converterDown("converter-icon_down") {  }
-      }
-      if (props.isView != true) {
-        portModelWidget {
-          attrs {
-            node = props.converterNode
-            port = props.converterNode.inPort
-            position = PortPosition.Left
-          }
-        }
-        portModelWidget {
-          attrs {
-            node = props.converterNode
-            port = props.converterNode.outPort
-            position = PortPosition.Right
-          }
-        }
-      }
-    }
+//    div {
+//      if (props.converterNode.function.params["from"]!! == "server") {
+//        converterUp("converter-icon_up") { }
+//      } else {
+//        converterDown("converter-icon_down") {  }
+//      }
+//      if (props.isView != true) {
+//        portModelWidget {
+//          attrs {
+//            node = props.converterNode
+//            port = props.converterNode.inPort
+//            position = PortPosition.Left
+//          }
+//        }
+//        portModelWidget {
+//          attrs {
+//            node = props.converterNode
+//            port = props.converterNode.outPort
+//            position = PortPosition.Right
+//          }
+//        }
+//      }
+//    }
   }
 
   interface Props : RProps {
@@ -75,8 +75,8 @@ class ConverterNodeFactory : AbstractNodeFactory<ConverterNode>("system") {
     val instance = ConverterNodeFactory()
   }
 
-  override fun getNewInstance(initialConfig: SystemFunction): ConverterNode {
-    return ConverterNode(initialConfig)
+  override fun getNewInstance(): ConverterNode {
+    return ConverterNode()
   }
 
   override fun generateReactWidget(diagramEngine: DiagramEngine, node: ConverterNode): ReactElement = buildElement {

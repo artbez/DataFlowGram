@@ -12,6 +12,7 @@ external class DiagramEngine {
     fun getRelativeMousePoint(event: Event): Point
     fun getDiagramModel(): DiagramModel
     fun registerNodeFactory(nodeFactory: AbstractNodeFactory<dynamic>)
+    fun registerPortFactory(portFactory: AbstractPortFactory<dynamic>)
 }
 
 external class Point {

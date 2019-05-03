@@ -29,18 +29,3 @@ class BeansInitializer : ApplicationContextInitializer<GenericApplicationContext
     bean<MainWSHandler>()
   }.initialize(applicationContext)
 }
-
-//@Component
-//class AfterInitializationHook(
-//  val gitConnector: GitConnector,
-//  val dispatcher: RootDispatcher,
-//  val configHandler: ConfigWsHandler
-//) {
-//
-//  @EventListener
-//  fun handleContextRefresh(event: ContextRefreshedEvent) {
-//    gitConnector.addListener(dispatcher)
-//    gitConnector.addListener(configHandler)
-//    gitConnector.start()
-//  }
-//}
