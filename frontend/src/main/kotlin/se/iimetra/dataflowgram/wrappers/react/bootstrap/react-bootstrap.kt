@@ -13,7 +13,7 @@ external interface PopoverProps : RProps {
 external val Popover : RClass<PopoverProps>
 
 external interface OverlayTriggerProps : RProps {
-  var trigger : String // click
+  var trigger : dynamic // click
   var placement: String // top, bottom, left, right
   var overlay: ReactElement
 }

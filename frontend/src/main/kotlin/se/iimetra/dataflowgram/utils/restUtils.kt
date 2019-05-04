@@ -20,7 +20,7 @@ suspend fun get(url: String, body: dynamic = null, headers: dynamic = defaultHea
   }
 }
 
-suspend fun post(url: String, body: dynamic = null, headers: dynamic): String {
+suspend fun post(url: String, body: dynamic = null, headers: dynamic = defaultHeaders): String {
   val response = request(POST, url, body, headers)
   if (!response.ok) {
     window.alert(response.text().await())
