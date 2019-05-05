@@ -11,6 +11,7 @@ import se.iimetra.dataflowgram.controller.ws.FilesSystemHandler
 import se.iimetra.dataflowgram.files.FileSystemConnector
 import se.iimetra.dataflowgram.git.GitConnector
 import se.iimetra.dataflowgram.worker.Worker
+import se.iimetra.dataflowgram.worker.WorkerAction
 import java.nio.file.Path
 import java.util.concurrent.CompletableFuture
 
@@ -63,6 +64,18 @@ class RootDispatcher(
 
   suspend fun uploadFile(path: Path): CompletableFuture<String> {
     return worker.uploadFile(path)
+  }
+
+  suspend fun deleteAll(): CompletableFuture<Unit> {
+    return worker.deleteAll()
+  }
+
+  suspend fun deleteRef(ref: String): CompletableFuture<Unit> {
+    return worker.deleteRef(ref)
+  }
+
+  suspend fun deleteResource(res: String): CompletableFuture<Unit> {
+    return worker.deleteResource(res)
   }
 
   suspend fun outData(ref: String, type: String): CompletableFuture<ValueTypePair> {

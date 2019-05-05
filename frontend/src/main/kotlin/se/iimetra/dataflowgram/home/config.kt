@@ -38,7 +38,18 @@ val executionService = ExecutionService()
 val eventController = EventController()
 val converterController = ConverterEventController()
 
-fun NodeModel.neighbors() = getPorts().toMap().values.map { it as InitialPortModel }
+fun NodeModel.neighbors() = inPorts()
+  .flatMap { port -> port.getLinks().toMap().values.flatMap {
+    kotlin.collections.listOf(
+      it.getSourcePort(),
+      it.getTargetPort()
+    )
+  } }
+  .map { it as InitialPortModel }
+  .map { it.getNode() }
+  .filter { it.getID() != this.getID() }
+
+fun NodeModel.neighborsAll() = getPorts().toMap().values.map { it as InitialPortModel }
   .flatMap { it.getLinks().toMap().values.flatMap {
     kotlin.collections.listOf(
       it.getSourcePort(),
@@ -49,6 +60,14 @@ fun NodeModel.neighbors() = getPorts().toMap().values.map { it as InitialPortMod
   .map { it.getNode() }
   .filter { it.getID() != this.getID() }
 
+fun NodeModel.selectAll2(): List<NodeModel> {
+  val nearNodes = neighbors()
+    .filterNot { it.isSelected() }
+    .map { it.also { it.setSelected(true) } }
+
+  return nearNodes.plus(this).plus(nearNodes.flatMap { it.selectAllNodes2() }).distinctBy { it.getID() }
+}
+
 fun NodeModel.selectAllNodes(): List<NodeModel> {
   val nearNodes = neighbors()
     .filterNot { it.isSelected() }
@@ -56,6 +75,15 @@ fun NodeModel.selectAllNodes(): List<NodeModel> {
 
   return nearNodes.plus(this).plus(nearNodes.flatMap { it.selectAllNodes() }).distinctBy { it.getID() }
 }
+
+fun NodeModel.selectAllNodes2(): List<NodeModel> {
+  val nearNodes = neighborsAll()
+    .filterNot { it.isSelected() }
+    .map { it.also { it.setSelected(true) } }
+
+  return nearNodes.plus(this).plus(nearNodes.flatMap { it.selectAllNodes2() }).distinctBy { it.getID() }
+}
+
 
 fun NodeModel.inPorts() = getPorts().toMap().values.map { it as InitialPortModel }.filter { it.portType == PortType.In }
 

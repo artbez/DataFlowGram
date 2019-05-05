@@ -156,6 +156,18 @@ class ExecutionService(connector_pb2_grpc.ExecutorServicer):
 
         return connector_pb2.InResult(ref=next_name)
 
+    def Remove(self, request, context):
+        global global_vars
+        if request.all:
+            global_vars = dict(
+                fileOut= global_vars['fileOut'],
+                userDir= global_vars['userDir']
+            )
+        else:
+            global_vars.pop(request.ref, None)
+
+        return connector_pb2.Removed()
+
     @staticmethod
     def __getLocation(category, file, language):
         return 'myc_' + category + '_' + file + '_' + language

@@ -45,6 +45,10 @@ sealed class WorkerAction {
     override val result: CompletableFuture<String>
   ): CompletableAction<String>, WorkerAction()
 
+  data class RemoveAction(val all: Boolean, val ref: String?, val resource: String?,
+                          override val result: CompletableFuture<Unit>
+  ): CompletableAction<Unit>, WorkerAction()
+
 //  data class AllFiles(
 //    override val result: CompletableFuture<UserFilesInfo?>
 //  ): CompletableAction<UserFilesInfo?>, WorkerAction()

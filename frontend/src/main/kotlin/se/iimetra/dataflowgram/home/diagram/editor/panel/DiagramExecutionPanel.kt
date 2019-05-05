@@ -17,8 +17,8 @@ class DiagramExecutionPanel(
 
   val executionList: MutableList<ExecutionState> = mutableListOf()
 
-  fun <T : NodeModel> startNode(node: T): ExecutionState {
-    val state = ExecutionState(node)
+  fun <T : NodeModel> startNode(node: T, cache: Boolean = false): ExecutionState {
+    val state = ExecutionState(node, cache = cache)
     executionList.add(state)
     onChange(executionList)
     return state
@@ -49,6 +49,10 @@ class DiagramExecutionPanel(
       state.renderPng = "imgs/$value"
       onChange(executionList)
     }
+    if (type == "html") {
+      state.renderHtml = "imgs/$value"
+      onChange(executionList)
+    }
   }
 }
 
@@ -57,5 +61,7 @@ data class ExecutionState(
   var completed: Boolean = false,
   var logs: List<String>? = null,
   var errors: String? = null,
-  var renderPng: String? = null
+  var renderPng: String? = null,
+  var renderHtml: String? = null,
+  var cache: Boolean = false
 )

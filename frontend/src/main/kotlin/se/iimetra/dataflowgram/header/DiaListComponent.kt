@@ -13,7 +13,6 @@ import react.dom.span
 import se.iimetra.dataflow.AllDiagrams
 import se.iimetra.dataflow.DiagramDto
 import se.iimetra.dataflowgram.home.diagram.palette.ViewCell
-import se.iimetra.dataflowgram.home.paletteFileChoseController
 import se.iimetra.dataflowgram.utils.get
 import se.iimetra.dataflowgram.wrappers.react.devextreme.TreeView
 

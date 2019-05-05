@@ -40,7 +40,7 @@ class ESComponent : RComponent<ESComponent.Props, RState>() {
       }
     }
     div("configurer-props__group") {
-      b { +"Output:" }
+      b { +(if (props.state.cache) "Output (cached):" else "Output:") }
       OverlayTrigger {
         attrs {
           trigger = "click"
@@ -55,6 +55,12 @@ class ESComponent : RComponent<ESComponent.Props, RState>() {
                 img {
                   attrs {
                     src = props.state.renderPng!!
+                  }
+                }
+              } else if (props.state.renderHtml != null) {
+                iframe {
+                  attrs {
+                    src = props.state.renderHtml!!
                   }
                 }
               } else {

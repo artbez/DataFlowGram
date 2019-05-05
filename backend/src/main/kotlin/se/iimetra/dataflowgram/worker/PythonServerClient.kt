@@ -116,6 +116,27 @@ class PythonServerClient internal constructor(private val channel: ManagedChanne
     throw IllegalStateException("Should not be here")
   }
 
+  fun removeAll() {
+    val request = Connector.RemoveRequest.newBuilder().setAll(true).build()
+    try {
+      blockingStub.remove(request)
+    } catch (e: StatusRuntimeException) {
+      logger.error("RPC failed: {0}", e.status)
+      throw RuntimeException(e.status.description)
+    }
+  }
+
+  fun removeRef(ref: String) {
+    val request = Connector.RemoveRequest.newBuilder().setRef(ref).build()
+    try {
+      blockingStub.remove(request)
+    } catch (e: StatusRuntimeException) {
+      logger.error("RPC failed: {0}", e.status)
+      throw RuntimeException(e.status.description)
+    }
+  }
+
+
   companion object {
     private val logger = LoggerFactory.getLogger(PythonServerClient::class.java.name)
   }

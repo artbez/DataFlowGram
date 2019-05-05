@@ -18,6 +18,7 @@ import se.iimetra.dataflowgram.utils.post
 import se.iimetra.dataflowgram.utils.toMap
 import se.iimetra.dataflowgram.wrappers.react.bootstrap.OverlayTrigger
 import se.iimetra.dataflowgram.wrappers.react.bootstrap.Popover
+import se.iimetra.dataflowgram.wrappers.react.diagrams.BaseModelListener
 import se.iimetra.dataflowgram.wrappers.react.diagrams.DiagramEngine
 import se.iimetra.dataflowgram.wrappers.react.diagrams.models.DiagramModel
 import kotlin.browser.window
@@ -68,12 +69,20 @@ class HeaderComponent : RComponent<HeaderComponent.Props, HeaderComponent.State>
                   if (state.diaName == null) {
                     window.alert("Please, pick saveAs option in order to chose a name")
                   } else {
-                    GlobalScope.launch {
-                      val finalName = state.tmpName
-                      val diagramString = JSON.stringify(props.diagramModel.serializeDiagram())
-                      post("/api/diagram/save",Json.plain.stringify(DiagramSaveRequest.serializer(), DiagramSaveRequest(finalName, diagramString)))
-                      setState {
-                        diaName = finalName
+                    state.diaName?.let {
+                      GlobalScope.launch {
+                        val finalName = state.diaName
+                        val diagramString = JSON.stringify(props.diagramModel.serializeDiagram())
+                        post(
+                          "/api/diagram/save",
+                          Json.plain.stringify(
+                            DiagramSaveRequest.serializer(),
+                            DiagramSaveRequest(it, diagramString)
+                          )
+                        )
+                        setState {
+                          diaName = finalName
+                        }
                       }
                     }
                   }
@@ -114,7 +123,10 @@ class HeaderComponent : RComponent<HeaderComponent.Props, HeaderComponent.State>
                           } else {
                             val finalName = state.tmpName
                             val diagramString = JSON.stringify(props.diagramModel.serializeDiagram())
-                            val request = Json.plain.stringify(DiagramSaveRequest.serializer(), DiagramSaveRequest(finalName, diagramString))
+                            val request = Json.plain.stringify(
+                              DiagramSaveRequest.serializer(),
+                              DiagramSaveRequest(finalName, diagramString)
+                            )
                             GlobalScope.launch {
                               post("/api/diagram/save", request)
                               setState {
@@ -161,6 +173,15 @@ class HeaderComponent : RComponent<HeaderComponent.Props, HeaderComponent.State>
                           }
                           props.diagramModel.getLinks().toMap().forEach { props.diagramModel.removeLink(it.value) }
                           props.diagramModel.deSerializeDiagram(kotlin.js.JSON.parse(it.diagram), props.diaEngine)
+                          props.diagramModel.getNodes().toMap().forEach {
+                            it.value.addListener(
+                              BaseModelListener().events {
+                                this.selectionChanged = {
+                                  props.updateDiagram()
+                                }
+                              }
+                            )
+                          }
                         }
                       }
                     }

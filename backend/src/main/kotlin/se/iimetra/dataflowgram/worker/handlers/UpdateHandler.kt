@@ -19,6 +19,7 @@ class UpdateHandler(
   private val cache = FunctionsCache()
   private val logger = LoggerFactory.getLogger(UpdateHandler::class.java)
   private val updateList = ArrayList<UpdateLocation>()
+  val fileOut = ClassPathResource("public/imgs").file
 
   fun checkOutdated(functionId: FunctionId, version: Long) = cache.check(functionId, version)
   fun getFullFunction(functionId: FunctionId, version: Long) = cache.innerVersionCache[functionId]?.description
@@ -35,7 +36,6 @@ class UpdateHandler(
     val updated = cache.get(gitContent.version, gitContent.allFunctions())
     val files = toLocations(updated)
     val repo = gitConnector.localRepoDirectory.toAbsolutePath().toString()
-    val fileOut = ClassPathResource("public/imgs").file
 
     try {
       client.update(repo, fileOut.absolutePath.toString(), fileSystemConnector.userDir.toAbsolutePath().toString(), files)

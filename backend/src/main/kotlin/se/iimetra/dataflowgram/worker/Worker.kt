@@ -15,7 +15,9 @@ import se.iimetra.dataflowgram.worker.handlers.ConvertersHandler
 import se.iimetra.dataflowgram.worker.handlers.ExecutionHandler
 import se.iimetra.dataflowgram.worker.handlers.FileActionsHandler
 import se.iimetra.dataflowgram.worker.handlers.UpdateHandler
+import java.nio.file.Files
 import java.nio.file.Path
+import java.nio.file.Paths
 import java.util.concurrent.CompletableFuture
 
 
@@ -90,6 +92,26 @@ class Worker(private val gitConnector: GitConnector, private val filesSystemConn
         is WorkerAction.CreateFile, is WorkerAction.InitFile -> {
           fileActionsHandler.processFileAction(action)
         }
+        is WorkerAction.RemoveAction -> {
+          try {
+            when {
+              action.resource != null -> {
+                val pth = Paths.get(updateHandler.fileOut.absoluteFile.toString() + "/" + action.resource)
+                Files.delete(pth)
+              }
+              action.all -> {
+                client.removeAll()
+                action.result.complete(Unit)
+              }
+              action.ref != null -> {
+                client.removeRef(action.ref)
+                action.result.complete(Unit)
+              }
+            }
+          } catch (ex: Exception) {
+            action.result.completeExceptionally(ex)
+          }
+        }
       }
     }
   }
@@ -106,7 +128,13 @@ class Worker(private val gitConnector: GitConnector, private val filesSystemConn
 //    return future
 //  }
 
-  suspend fun execute(function: FunctionId, args: List<String>, params: Map<String, String>, version: Long, onMessageReceive: (String) -> Unit): CompletableFuture<String> {
+  suspend fun execute(
+    function: FunctionId,
+    args: List<String>,
+    params: Map<String, String>,
+    version: Long,
+    onMessageReceive: (String) -> Unit
+  ): CompletableFuture<String> {
     val future = CompletableFuture<String>()
     actionQueue.send(WorkerAction.Execute(function, args, params, version, onMessageReceive, future))
     return future
@@ -115,6 +143,24 @@ class Worker(private val gitConnector: GitConnector, private val filesSystemConn
   suspend fun uploadFile(path: Path): CompletableFuture<String> {
     val future = CompletableFuture<String>()
     actionQueue.send(WorkerAction.CreateFile(path, path.toFile().name, future))
+    return future
+  }
+
+  suspend fun deleteAll(): CompletableFuture<Unit> {
+    val future = CompletableFuture<Unit>()
+    actionQueue.send(WorkerAction.RemoveAction(true, null, null, future))
+    return future
+  }
+
+  suspend fun deleteRef(ref: String): CompletableFuture<Unit> {
+    val future = CompletableFuture<Unit>()
+    actionQueue.send(WorkerAction.RemoveAction(false, ref, null, future))
+    return future
+  }
+
+  suspend fun deleteResource(res: String): CompletableFuture<Unit> {
+    val future = CompletableFuture<Unit>()
+    actionQueue.send(WorkerAction.RemoveAction(false, null, res, future))
     return future
   }
 

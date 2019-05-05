@@ -40,17 +40,4 @@ class FileController(val fileSystemConnector: FileSystemConnector) {
     fileSystemConnector.deleteFile(path)
     return ResponseEntity.ok(Unit)
   }
-
-//  @RequestMapping(path = ["/get"], method = [RequestMethod.GET])
-//  fun get(@RequestParam("fileName") fileName: String): ResponseEntity<Resource> {
-//    val path = Paths.get(fileSystemConnector.userDir.toAbsolutePath().toString() + "/" + fileName)
-//    val ext = path.toFile().extension
-//    val resource = ByteArrayResource(Files.readAllBytes(path))
-//
-//    return ResponseEntity.ok()
-//      //.headers(headers)
-//      .contentLength(htmlOut.toString().length.toLong())
-//      .contentType(MediaType.TEXT_HTML)
-//      .body(resource)
-//  }
 }

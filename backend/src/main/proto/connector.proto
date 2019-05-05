@@ -16,6 +16,15 @@ message FileLocation {
     string language = 3;
 }
 
+message RemoveRequest {
+    oneof value {
+        bool all = 1;
+        string ref = 2;
+    }
+}
+
+message Removed {}
+
 message Updated {}
 
 message ExecutionRequest {
@@ -58,4 +67,5 @@ service Executor {
     rpc OutData (OutRequest) returns (OutResult) {}
     rpc InData (InRequest) returns (InResult) {}
     rpc UpdateLib (Update) returns (Updated) {}
+    rpc Remove (RemoveRequest) returns (Removed) {}
 }

@@ -16,6 +16,7 @@ import se.iimetra.dataflowgram.home.outPorts
 import se.iimetra.dataflowgram.utils.JsMap
 import se.iimetra.dataflowgram.wrappers.lodash.lodash
 import se.iimetra.dataflowgram.wrappers.react.diagrams.AbstractNodeFactory
+import se.iimetra.dataflowgram.wrappers.react.diagrams.BaseModelListener
 import se.iimetra.dataflowgram.wrappers.react.diagrams.DiagramEngine
 import se.iimetra.dataflowgram.wrappers.react.diagrams.models.NodeModel
 import kotlin.js.JSON as KJSON
