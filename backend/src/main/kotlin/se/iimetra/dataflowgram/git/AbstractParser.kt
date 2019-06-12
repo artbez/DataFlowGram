@@ -12,7 +12,7 @@ abstract class AbstractParser {
   protected abstract val comment: String
   protected abstract val functionCodeName: Pattern
 
-  private val functionNamePattern = lazy { Pattern.compile("$comment function=(.*?)$") }
+    private val functionNamePattern = lazy { Pattern.compile("$comment function=(.*?)$") }
   private val signaturePattern = lazy { Pattern.compile("$comment signature=\\((.*?)\\)->(.+?)$") }
   private val paramsPattern = lazy { Pattern.compile("$comment param@(.*?):(.*?)$") }
   private val descriptionPattern = lazy { Pattern.compile("$comment description=(.*?)$") }

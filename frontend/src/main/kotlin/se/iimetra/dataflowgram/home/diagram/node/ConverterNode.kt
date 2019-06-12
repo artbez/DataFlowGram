@@ -15,8 +15,10 @@ import se.iimetra.dataflowgram.home.diagram.node.ports.portModelWidget
 import se.iimetra.dataflowgram.wrappers.react.diagrams.AbstractNodeFactory
 import se.iimetra.dataflowgram.wrappers.react.diagrams.DiagramEngine
 import se.iimetra.dataflowgram.wrappers.react.diagrams.models.NodeModel
+import kotlin.js.Math
+import kotlin.random.Random
 
-class ConverterNode : NodeModel("system", "") {
+class ConverterNode : NodeModel("system", Random(42).nextDouble().toString()) {
 
   val inPort: InitialPortModel = TODO()//InitialPortModel(function.functionSignature.input[0], PortType.In, 0)
   val outPort: InitialPortModel = TODO()// InitialPortModel(function.functionSignature.output, PortType.Out, -1)

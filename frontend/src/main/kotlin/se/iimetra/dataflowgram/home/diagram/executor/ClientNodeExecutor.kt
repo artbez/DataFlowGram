@@ -34,7 +34,7 @@ class ClientNodeExecutor(node: NodeModel, panel: DiagramExecutionPanel) : Abstra
 
   @UseExperimental(ImplicitReflectionSerializer::class)
   override suspend fun execute(cache: Boolean) {
-    if (executed) {
+    if (executed && dataValue != null) {
       if (panel.canProcess) {
         panel.startNode(node, true)
         if (lastError != null) {
@@ -42,7 +42,6 @@ class ClientNodeExecutor(node: NodeModel, panel: DiagramExecutionPanel) : Abstra
         } else {
           panel.render(node, (node as InitDefaultNode).function.meta.signature.output, dataValue!!)
           panel.stopNode(node)
-          dataValue = outData?.getValue()
           outData?.setValue(dataValue)
         }
         executed = true
@@ -65,7 +64,7 @@ class ClientNodeExecutor(node: NodeModel, panel: DiagramExecutionPanel) : Abstra
             }
 
             else -> GlobalScope.launch {
-              panel.render(node, "png", response.ref!!)
+              panel.render(node, node.function.meta.signature.output, response.ref!!)
               panel.stopNode(node)
               dataValue = response.ref
               outData?.setValue(response.ref)

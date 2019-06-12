@@ -14,6 +14,9 @@ import grpc
 import connector_pb2
 import connector_pb2_grpc
 
+os.environ['KMP_DUPLICATE_LIB_OK']='True'
+
+
 _ONE_DAY_IN_SECONDS = 60 * 60 * 24
 
 cwd = os.getcwd()

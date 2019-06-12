@@ -7,6 +7,7 @@ external interface PopoverProps : RProps {
   var id : String
   var placement: String // top, bottom, left, right
   var title: String
+  var container: dynamic
 }
 
 @JsName("Popover")

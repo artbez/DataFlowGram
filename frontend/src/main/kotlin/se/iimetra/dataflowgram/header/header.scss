@@ -1,5 +1,21 @@
 .header-nav {
-  height: 5rem;
+   height: 5rem;
+}
+
+.header-nav:first-child {
+  border-style: solid;
+}
+
+.main-header {
+  border-style: solid;
+}
+
+.navbar-default .navbar-brand {
+  color: black;
+}
+
+.navbar-default .navbar-nav>li>a {
+  color: black;
 }
 
 body {

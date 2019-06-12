@@ -50,15 +50,16 @@ class ESComponent : RComponent<ESComponent.Props, RState>() {
               attrs {
                 id = "popover-select-output"
                 title = "Output"
+                container = "body"
               }
               if (props.state.renderPng != null) {
-                img {
+                img(classes = "inner-img") {
                   attrs {
                     src = props.state.renderPng!!
                   }
                 }
               } else if (props.state.renderHtml != null) {
-                iframe {
+                iframe(classes = "iframe-gl") {
                   attrs {
                     src = props.state.renderHtml!!
                   }

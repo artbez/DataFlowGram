@@ -18,6 +18,7 @@ import se.iimetra.dataflowgram.wrappers.react.diagrams.models.LinkModel
 import se.iimetra.dataflowgram.wrappers.react.diagrams.models.NodeModel
 import se.iimetra.dataflowgram.wrappers.react.diagrams.models.PortModel
 import se.iimetra.dataflowgram.wrappers.react.tippy.Tooltip
+import kotlin.random.Random
 
 enum class PortType {
   In, Out;
@@ -68,6 +69,7 @@ class InitialPortModel constructor(): PortModel(type = "default") {
 //        return false
 //      }
 //    }
+
     return portType != port.portType && sname == port.sname && curNode != otherNode
        // && getLinks().toMap().size == 1 && port.getLinks().toMap().size == 1
   }

@@ -19,7 +19,7 @@ class FileSystemConnector {
   }
 
   fun getAllFiles(): UserFilesInfo? {
-    val files = Files.list(userDir).toList().filter { Files.isRegularFile(it) }
+    val files = Files.list(userDir).use { it.toList().filter { Files.isRegularFile(it) } }
     val newInfo = UserFilesInfo(files.map { FileInfo(it.fileName.toString(), false) })
     lastInfo = newInfo
     return newInfo

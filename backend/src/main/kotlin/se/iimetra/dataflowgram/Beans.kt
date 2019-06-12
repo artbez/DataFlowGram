@@ -16,7 +16,7 @@ import se.iimetra.dataflowgram.root.RootDispatcher
 class BeansInitializer : ApplicationContextInitializer<GenericApplicationContext> {
   override fun initialize(applicationContext: GenericApplicationContext) = beans {
     bean {
-      val repo = "/Users/artemii.bezguzikov/project/tt"
+      val repo = "/Users/artemii.bezguzikov/project/tt2"
       GitConnector(repo)
     }
     //bean<CommonsMultipartResolver>()

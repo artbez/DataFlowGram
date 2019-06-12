@@ -39,13 +39,13 @@ class HeaderComponent : RComponent<HeaderComponent.Props, HeaderComponent.State>
 
   override fun RBuilder.render() {
     nav("navbar navbar-default header-nav navbar-fixed-top") {
-      div("container-fluid") {
+      div("container-fluid main-header") {
         div("navbar-header") {
-          homeLink("navbar-brand", state.diaName ?: "Diagram executor")
+          homeLink("navbar-brand panel-button-1", state.diaName ?: "Diagram executor")
         }
         ul("nav navbar-nav") {
           li {
-            a {
+            a("panel-button-2") {
               attrs {
                 href = "#"
                 onClickFunction = {
